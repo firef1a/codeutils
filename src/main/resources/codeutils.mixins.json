@@ -1,0 +1,26 @@
+{
+  "required": true,
+  "package": "mia.codeutils.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "hud.MInGameHUD",
+    "hud.MMouse",
+    "hud.MTitleScreen",
+    "hud.MToastManager",
+    "player.MClientPlayerInteractionManager",
+    "player.MLivingEntityRenderer",
+    "player.MMinecraftClient",
+    "render.MSignBlockEntity"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  },
+  "mixins": [
+    "network.MClientConnection",
+    "player.MEntity",
+    "render.MSignBlockEntity"
+	]
+}

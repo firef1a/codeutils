@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "codeutils",
+	"version": "${version}",
+	"name": ".codeutils",
+	"description": "one person gets meteorclient everyone else has to run",
+	"authors": ["meowara"],
+	"contact": {
+		"sources": "https://github.com/firef1a/codeutils"
+	},
+	"license": "MIT",
+	"icon": "assets/codeutils/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"client": [
+			"mia.codeutils.Mod"
+		]
+	},
+	"mixins": [
+		"codeutils.mixins.json"
+	],
+	"accessWidener" : "codeutils.accesswidener",
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"fabric": "*"
+	},
+	"conflicts": {
+		"modutils": "*"
+	}
+}
