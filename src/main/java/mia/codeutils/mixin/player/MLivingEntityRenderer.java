@@ -2,6 +2,7 @@ package mia.codeutils.mixin.player;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import mia.codeutils.Mod;
+import mia.codeutils.features.FeatureManager;
 import mia.codeutils.features.impl.moderation.tracker.HitRange;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -25,7 +26,7 @@ public abstract class MLivingEntityRenderer{
         Vec3 pos = new Vec3(state.x, state.y, state.z);
 
         if (!(state instanceof AvatarRenderState playerState)) return;
-
+        if (!FeatureManager.getFeature(HitRange.class).getEnabled()) return;
         submitNodeCollector.submitCustomGeometry(matrices, HitRange.QUADS, (entry, vertices) -> HitRange.drawCircle(entry, vertices, playerState));
     }
 }

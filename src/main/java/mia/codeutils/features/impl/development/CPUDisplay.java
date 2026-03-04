@@ -30,7 +30,7 @@ public final class CPUDisplay extends Feature implements RenderHUD, PacketListen
 
 
     public CPUDisplay(Categories category) {
-        super(category, "CPU Display", "cpuwheel", "its a wheel");
+        super(category, "CPU Display", "cpuwheel", "Displays CPU % as a solid bar, requires other CPU HUDs from other mods (such as CodeClient) to be disabled first.");
     }
 
 

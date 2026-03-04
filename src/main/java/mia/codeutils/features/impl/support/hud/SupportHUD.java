@@ -43,7 +43,7 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
     private static DrawRect supportHUDContainer;
 
     public SupportHUD(Categories category) {
-        super(category, "Support HUD", "supporthud", "get back to work wageslave, put on that customer service smile and get those sparks!");
+        super(category, "Support HUD", "supporthud", "get back to work wageslave, put on that customer service smile and earn those sparks!");
 
     }
 

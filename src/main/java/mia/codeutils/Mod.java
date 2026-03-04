@@ -52,8 +52,8 @@ public class Mod implements ClientModInitializer {
 		Mod.registerCallbacks();
 		FeatureManager.getFeaturesByIdentifier(RegisterKeyBindEvent.class).forEach(RegisterKeyBindEvent::registerKeyBind);
 
-		log("codeutils initialization complete! :3");
 		log("""
+                         codeutils initialization complete! :3
                 
                                  .___             __  .__.__         \s
                   ____  ____   __| _/____  __ ___/  |_|__|  |   ______
@@ -61,6 +61,8 @@ public class Mod implements ClientModInitializer {
                 \\  \\__(  <_> ) /_/ \\  ___/|  |  /|  | |  |  |__\\___ \\\s
                  \\___  >____/\\____ |\\___  >____/ |__| |__|____/____  >
                      \\/           \\/    \\/                         \\/\s
+                     
+											   now in COLOR!
                 """);
 	}
 

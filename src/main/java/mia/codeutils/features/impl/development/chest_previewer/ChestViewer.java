@@ -49,7 +49,6 @@ public final class ChestViewer extends Feature implements RenderHUD, PacketListe
 
     @Override
     public void receivePacket(Packet<?> packet, CallbackInfo ci) {
-        if (true) return;
         if (!LocationAPI.getMode().equals(DFMode.DEV)) return;
         if (Mod.MC.player == null) return;
 
@@ -77,7 +76,6 @@ public final class ChestViewer extends Feature implements RenderHUD, PacketListe
 
     @Override
     public void renderHUD(GuiGraphics context, DeltaTracker tickCounter) {
-        if (true) return;
         if (!LocationAPI.getMode().equals(DFMode.DEV)) return;
         if (Mod.MC.player == null) return;
         if (Mod.MC.level == null) return;

@@ -73,11 +73,11 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
 
         int i = 0;
         for (String player : trackedPlayers) {
-            Component playerText = Component.literal(player).withColor(0xed7aff);
+            boolean online = StreamUtils.getPlayerList(false).contains(player);
+            int onlineColor = online ? ColorBank.MC_GREEN : ColorBank.MC_RED;
+            Component playerText = Component.literal(player + " ").withColor(0xed7aff).append(Component.literal(online ? "online" : "offline").withColor(onlineColor));
             DrawRect playerContainer = new DrawRect(new Point(0,(eachHeight+1) * (i + 1)), new Point(Mod.MC.font.width(playerText.getString()) + (margin + 1) * 2, eachHeight), 0, new ARGB(ColorBank.BLACK, 0.6f), container);
-            DrawRect playerContainerSide = new DrawRect(new Point(0,0), new Point(2, playerContainer.getHeight()), 0, new ARGB(0xed7aff, 1f), playerContainer);
-            //DrawRect playerContainerUnderline = new DrawRect(new Point(0,-1), new Point(playerContainer.getWidth(), 1), 0, new ARGB(0xed7aff, 1f), playerContainer);
-            //playerContainerUnderline.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
+            DrawRect playerContainerSide = new DrawRect(new Point(0,0), new Point(2, playerContainer.getHeight()), 0, new ARGB(onlineColor, 1f), playerContainer);
             DrawText playerTitle = new DrawText(new Point(margin + 2,0), playerText, 0, 1f,false, playerContainer);
             playerTitle.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
             playerTitle.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
@@ -96,7 +96,6 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
                 .rotateY((float) Math.toRadians(Mod.MC.gameRenderer.getMainCamera().yRot() + 180.0F));
         Matrix4f projectionMatrix = Mod.MC.gameRenderer.getProjectionMatrix((float) currentFov);
 
-        if (projectionMatrix == null) return;
         Frustum frustum = new Frustum(modelViewMatrix, projectionMatrix);
         Vec3 camPos = Mod.MC.gameRenderer.getMainCamera().position();
         frustum.prepare(camPos.x, camPos.y, camPos.z);
@@ -119,6 +118,7 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         }
     }
 
+    // Need to readd rainbow outline functionality
     public void renderPlayerOutline(GuiGraphics context, Player playerEntity, DeltaTracker tickCounter) {
         ArrayList<Double> xCords = new ArrayList<>();
         ArrayList<Double> yCords = new ArrayList<>();
@@ -149,10 +149,13 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
 
         int period = 5;
         long phase = 500L;
+
         ARGB c1 = isRainbow ? ARGB.getRainbowARGB(0+phase, period) : purple;
+        /*
         ARGB c2 = isRainbow ? ARGB.getRainbowARGB(100L+phase, period) : purple;
         ARGB c3 = isRainbow ? ARGB.getRainbowARGB(200L+phase, period) : purple;
         ARGB c4 = isRainbow ? ARGB.getRainbowARGB(300L+phase, period) : purple;
+         */
 
         int x = boundingX;
         int y = boundingY;
