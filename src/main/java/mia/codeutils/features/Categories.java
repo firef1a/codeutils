@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public enum Categories {
-    GENERAL(new Category("general")),
-    DEV(new Category("development")),
-    SUPPORT(new Category("support")),
-    MODERATION(new Category("moderation")),
-    SILLY(new Category("silly :3")),
-    INTERNAL(new Category("internal"));
+    GENERAL(new Category("General", "General Features")),
+    DEV(new Category("Development", "Dev-mode Features")),
+    SUPPORT(new Category("Support", "Support Staff Features")),
+    MODERATION(new Category("Moderation", "Moderator features")),
+    SILLY(new Category("Silly :3", ":3:3:3:3:3")),
+    INTERNAL(new Category("Internal", "Machine, turn back now. The layers of this palace are not for your kind."));
 
     private final Category category;
 

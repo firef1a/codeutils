@@ -2,6 +2,8 @@ package mia.codeutils.features.parameters;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import dev.isxander.yacl3.api.ConfigCategory;
+import dev.isxander.yacl3.api.OptionGroup;
 import mia.codeutils.config.ConfigStore;
 
 public abstract class ParameterDataField<T> {
@@ -26,6 +28,8 @@ public abstract class ParameterDataField<T> {
 
     public abstract void serialize(JsonObject jsonObject);
     public abstract T deserialize(JsonElement jsonObject);
+
+    public abstract void addYACLParameter(OptionGroup.Builder featureGroup);
 
 
     public String getName() { return this.name; }

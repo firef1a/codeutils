@@ -1,6 +1,8 @@
 package mia.codeutils.features;
 
+import mia.codeutils.features.impl.development.CPUDisplay;
 import mia.codeutils.features.impl.development.CodeSignColorer;
+import mia.codeutils.features.impl.development.ItemTagViewer;
 import mia.codeutils.features.impl.development.SignPeek;
 import mia.codeutils.features.impl.development.chest_previewer.ChestViewer;
 import mia.codeutils.features.impl.general.AutoTip;
@@ -14,11 +16,12 @@ import mia.codeutils.features.impl.internal.server.ServerManager;
 import mia.codeutils.features.impl.internal.staff.VanishTracker;
 import mia.codeutils.features.impl.internal.superdupertopsecrte.VerboseLogger;
 import mia.codeutils.features.impl.moderation.BetterVanishMSG;
-import mia.codeutils.features.impl.moderation.PunishFeature;
 import mia.codeutils.features.impl.moderation.VanishFly;
 import mia.codeutils.features.impl.moderation.reports.clickonreportsinchattoteleporttothem;
+import mia.codeutils.features.impl.moderation.tracker.HitRange;
 import mia.codeutils.features.impl.moderation.tracker.PlayerOutliner;
 import mia.codeutils.features.impl.support.AutoQueue;
+import mia.codeutils.features.impl.support.hud.SupportHUD;
 import mia.codeutils.features.listeners.AbstractEventListener;
 
 import java.util.Collection;
@@ -51,14 +54,18 @@ public final class FeatureManager {
         add(new CodeSignColorer(Categories.DEV));
         add(new ChestViewer(Categories.DEV));
         add(new SignPeek(Categories.DEV));
+        add(new CPUDisplay(Categories.DEV));
+        add(new ItemTagViewer(Categories.DEV));
 
         add(new AutoQueue(Categories.SUPPORT));
+        add(new SupportHUD(Categories.SUPPORT));
 
         add(new BetterVanishMSG(Categories.MODERATION));
         add(new VanishFly(Categories.MODERATION));
         add(new clickonreportsinchattoteleporttothem(Categories.MODERATION));
-        //add(new PunishFeature(Categories.MODERATION));
+        add(new HitRange(Categories.MODERATION));
         add(new PlayerOutliner(Categories.MODERATION));
+
         initInternalFeatures();
     }
 

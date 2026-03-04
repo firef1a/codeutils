@@ -136,14 +136,14 @@ public class PunishScreen extends Screen {
         int reasonTextMargin = 2;
 
         titleBar = new DrawRect(new Point(0,0), new Point(mainContainer.getWidth(), 20), 0, new ARGB(ColorBank.BLACK, 0.75f), mainContainer);
-        titleText = new DrawText(new Point(7,10), Component.literal("").withStyle(ChatFormatting.ITALIC), 0, true, titleBar);
+        titleText = new DrawText(new Point(7,10), Component.literal("").withStyle(ChatFormatting.ITALIC), 0, 1f, true, titleBar);
         updateTitleText(selectedPunishment);
         titleText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
         recentSidebar = new DrawRect(new Point(0,0), new Point(150, mainContainer.getHeight()-titleBar.getHeight()), 0, new ARGB(ColorBank.BLACK, 0.2f), titleBar);
         recentSidebar.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
 
-        DrawText recentReasonsText = new DrawText(new Point(selectorMargin, selectorMargin), Component.literal("Recent Reasons:").withStyle(ChatFormatting.GRAY), 0, true, recentSidebar);
+        DrawText recentReasonsText = new DrawText(new Point(selectorMargin, selectorMargin), Component.literal("Recent Reasons:").withStyle(ChatFormatting.GRAY), 0, 1f,true, recentSidebar);
 
         int i = 0;
         for (String reason : recentReasonsStrings) {
@@ -161,7 +161,7 @@ public class PunishScreen extends Screen {
                 reasonInputWidget.setValue(reason, true);
             });
             registerButton(reasonButton);
-            DrawText reasonButtonText = new DrawText(new Point(5, 0), Component.literal(reason).withColor(ColorBank.WHITE_GRAY), 0, true, reasonButton);
+            DrawText reasonButtonText = new DrawText(new Point(5, 0), Component.literal(reason).withColor(ColorBank.WHITE_GRAY), 0, 1f, true, reasonButton);
             reasonButtonText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
             reasonButtonText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
             i++;
@@ -174,7 +174,7 @@ public class PunishScreen extends Screen {
         selectorContainer.setParentBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.NONE));
 
 
-        DrawText reasonText = new DrawText(new Point(selectorMargin, selectorMargin), Component.literal("Reason:").withStyle(ChatFormatting.GRAY), 0, true, selectorContainer);
+        DrawText reasonText = new DrawText(new Point(selectorMargin, selectorMargin), Component.literal("Reason:").withStyle(ChatFormatting.GRAY), 0, 1f, true, selectorContainer);
 
         reasonInputWidget = MultiLineEditBox.builder()
             .setX(reasonText.x1())
@@ -186,7 +186,7 @@ public class PunishScreen extends Screen {
 
         // punishment options
 
-        DrawText warnText = new DrawText(new Point(selectorMargin, selectorMargin * 2 + reasonInput + reasonText.getHeight() + reasonTextMargin), Component.literal("Warn:").withStyle(ChatFormatting.GRAY), 0, true, selectorContainer);
+        DrawText warnText = new DrawText(new Point(selectorMargin, selectorMargin * 2 + reasonInput + reasonText.getHeight() + reasonTextMargin), Component.literal("Warn:").withStyle(ChatFormatting.GRAY), 0, 1f, true, selectorContainer);
 
         warnButton = new DrawLabeledPunishmentOption(
                 new Point(0,2),
@@ -214,14 +214,14 @@ public class PunishScreen extends Screen {
         registerButton(warnButton);
 
 
-        DrawText muteText = new DrawText(warnText.getRawPosition().add(new Point(selectorMargin + warnButton.getWidth(), 0)), Component.literal("Mute Durations:").withStyle(ChatFormatting.GRAY), 0, true, selectorContainer);
+        DrawText muteText = new DrawText(warnText.getRawPosition().add(new Point(selectorMargin + warnButton.getWidth(), 0)), Component.literal("Mute Durations:").withStyle(ChatFormatting.GRAY), 0, 1f, true, selectorContainer);
 
         int punishmentContainerHeight = (int) Math.ceil((double) (warnButton.getHeight() - (selectorMargin + 2 + muteText.getHeight())) / 2.0);
 
         muteContainer = new DrawRect(new Point(0, 2), new Point(selectorContainer.getWidth() - (warnButton.getWidth() + selectorMargin * 3), punishmentContainerHeight),0, new ARGB(ColorBank.MC_RED, 0.0f), muteText);
         muteContainer.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
 
-        DrawText banText = new DrawText(new Point(0, selectorMargin), Component.literal("Ban Durations:").withStyle(ChatFormatting.GRAY), 0, true, muteContainer);
+        DrawText banText = new DrawText(new Point(0, selectorMargin), Component.literal("Ban Durations:").withStyle(ChatFormatting.GRAY), 0, 1f, true, muteContainer);
         banText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
 
         banContainer = new DrawRect(new Point(0, 2), new Point(muteContainer.getWidth(), punishmentContainerHeight),0, new ARGB(ColorBank.MC_RED, 0.0f), banText);

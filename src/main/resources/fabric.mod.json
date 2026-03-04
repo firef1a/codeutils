@@ -14,6 +14,9 @@
 	"entrypoints": {
 		"client": [
 			"mia.codeutils.Mod"
+		],
+		"modmenu": [
+			"mia.codeutils.ModMenuIntegration"
 		]
 	},
 	"mixins": [
@@ -22,7 +25,10 @@
 	"accessWidener" : "codeutils.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.18.4",
-		"fabric": "*"
+		"minecraft": "~1.21.11",
+		"fabric-api": "*",
+		"java": ">=21",
+		"yet_another_config_lib_v3": ">=3.8.2+1.21.11-fabric"
 	},
 	"conflicts": {
 		"modutils": "*"

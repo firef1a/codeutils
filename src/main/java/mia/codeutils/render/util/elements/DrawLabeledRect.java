@@ -16,7 +16,7 @@ public class DrawLabeledRect extends DrawRect {
     public DrawLabeledRect(Point position, Point size, Component text, int z, ARGB color, boolean shadow, DrawObject parent) {
         super(position, size, z, color, parent);
 
-        DrawText label = new DrawText(new Point(0, 0), text, 0, shadow, this);
+        DrawText label = new DrawText(new Point(0, 0), text, 0, 1f, shadow, this);
         label.setParentBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
         label.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
         addDrawable(label);

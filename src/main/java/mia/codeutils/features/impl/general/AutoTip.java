@@ -20,10 +20,6 @@ import java.util.regex.Pattern;
 public final class AutoTip extends Feature implements ChatEventListener {
     public AutoTip(Categories category) {
         super(category, "AutoTip", "autotip", "Automatically tips boosters");
-        new BooleanDataField("testing", ParameterIdentifier.of(this, "testing"), true, true);
-        new StringDataField("testing", ParameterIdentifier.of(this, "abc"), "hi", true);
-        new IntegerDataField("testing", ParameterIdentifier.of(this, "dc"), 23424, true);
-        new IntegerSliderDataField("testing", ParameterIdentifier.of(this, "dc"), 50, 0, 100, true);
     }
 
     @Override

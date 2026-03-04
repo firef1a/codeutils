@@ -56,6 +56,10 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         renderPlayerOutlines(context, tickCounter);
     }
 
+    public ArrayList<String> getTrackedPlayers() {
+        return trackedPlayers;
+    }
+
     private void renderTrackerList(GuiGraphics context, DeltaTracker tickCounter) {
         int margin = 5;
         int eachHeight = Mod.MC.font.lineHeight + margin * 2;
@@ -63,7 +67,7 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         DrawRect container = new DrawRect(new Point(5,5), new Point(Mod.MC.font.width(titleText.getString()) + margin * 2, eachHeight), 0, new ARGB(ColorBank.BLACK, 0.8f));
         DrawRect containerUnderline = new DrawRect(new Point(0,-1), new Point(container.getWidth(), 1), 0, new ARGB(0xed7aff, 1f),container);
         containerUnderline.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
-        DrawText containerTitle = new DrawText(new Point(margin,0), titleText, 0, true, container);
+        DrawText containerTitle = new DrawText(new Point(margin,0), titleText, 0, 1f,true, container);
         containerTitle.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
         containerTitle.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
@@ -74,7 +78,7 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
             DrawRect playerContainerSide = new DrawRect(new Point(0,0), new Point(2, playerContainer.getHeight()), 0, new ARGB(0xed7aff, 1f), playerContainer);
             //DrawRect playerContainerUnderline = new DrawRect(new Point(0,-1), new Point(playerContainer.getWidth(), 1), 0, new ARGB(0xed7aff, 1f), playerContainer);
             //playerContainerUnderline.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
-            DrawText playerTitle = new DrawText(new Point(margin + 2,0), playerText, 0, false, playerContainer);
+            DrawText playerTitle = new DrawText(new Point(margin + 2,0), playerText, 0, 1f,false, playerContainer);
             playerTitle.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
             playerTitle.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
             i++;
@@ -166,7 +170,7 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         Component labelText = Component.literal(playerEntity.getName().getString()).withColor(ColorBank.WHITE);
 
         DrawRect labelRect = new DrawRect(new Point(x, y - labelRectHeight), new Point(Mod.MC.font.width(labelText.getString()) + labelRectMargin*2, labelRectHeight), 0, fadedPurple);
-        DrawText labelDrawText = new DrawText(new Point(labelRectMargin, 0), labelText, 0, true, labelRect);
+        DrawText labelDrawText = new DrawText(new Point(labelRectMargin, 0), labelText, 0, 1f, true, labelRect);
         labelDrawText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
         labelDrawText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 

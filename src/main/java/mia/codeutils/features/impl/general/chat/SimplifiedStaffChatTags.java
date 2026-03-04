@@ -25,11 +25,14 @@ public final class SimplifiedStaffChatTags extends Feature implements ChatEventL
     private static Component getPrefix(int color) { return Component.empty().append(literal("›").withColor(color)); }
 
     public SimplifiedStaffChatTags(Categories category) {
-        super(category, "Better Staff Tags", "bsct", "Simplified staff chat tags.");
+        super(category, "Simple Staff Tags", "simple_staff_tags", "Simplifies staff chat tags.");
     }
 
     @Override
     public ModifiableEventResult<Component> chatEvent(ModifiableEventData<Component> message, CallbackInfo ci) {
+
+        Component test = Component.literal("[A] real [B] test");
+        //replaceTextNew(test, Pattern.compile(""))
         Component modified = message.modified();
 
         // regular stuff
@@ -38,6 +41,7 @@ public final class SimplifiedStaffChatTags extends Feature implements ChatEventL
                 new SCR(Pattern.compile("\\[MOD] "), MOD),
                 new SCR(Pattern.compile("\\[ADMIN] "), ADMIN)
         ));
+
         for (SCR scr : scrs) modified = replaceTextNew(modified, scr.pattern(), scr.replacement());
 
         // session peek

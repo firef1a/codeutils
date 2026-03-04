@@ -3,6 +3,7 @@ package mia.codeutils.render.util;
 import mia.codeutils.ColorBank;
 import mia.codeutils.Mod;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public class DrawContextHelper {
         drawRect(context, x, y+height-1, width, 1, color);
     }
 
-    public static void drawText(GuiGraphics context, Component text, int x, int y, boolean shadow) {
-        context.drawString(Mod.MC.font, text, x, y, ColorBank.WHITE, shadow);
+    public static void drawText(GuiGraphics context, Component text, int x, int y, float alpha, boolean shadow) {
+        context.drawString(Mod.MC.font, text, x, y, ARGB.getARGB(ColorBank.WHITE, alpha), shadow);
     }
     public static void drawTooltip(GuiGraphics context, Component text, int x, int y, boolean yCentered) {
         drawTooltip(context, List.of(text), x, y, yCentered);
@@ -43,10 +44,14 @@ public class DrawContextHelper {
 
         int i = 0;
         for (Component text : list) {
-            drawText(context, text, baseX+margin, baseY + margin + i * (Mod.MC.font.lineHeight + 2), true);
+            drawText(context, text, baseX+margin, baseY + margin + i * (Mod.MC.font.lineHeight + 2), 1f, true);
             i++;
         }
 
+    }
+
+    public static void addGUIElement(GuiGraphics context, GuiElementRenderState elementRenderState) {
+        context.guiRenderState.submitGuiElement(elementRenderState);
     }
 }
 

@@ -10,6 +10,7 @@
     "player.MClientPlayerInteractionManager",
     "player.MLivingEntityRenderer",
     "player.MMinecraftClient",
+    "render.RenderTypeAccessor",
     "render.MSignBlockEntity"
   ],
   "injectors": {

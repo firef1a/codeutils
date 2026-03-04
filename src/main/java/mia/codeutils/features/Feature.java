@@ -4,6 +4,7 @@ import mia.codeutils.features.listeners.impl.AlwaysEnabled;
 import mia.codeutils.features.parameters.ParameterDataField;
 import mia.codeutils.features.parameters.ParameterIdentifier;
 import mia.codeutils.features.parameters.impl.BooleanDataField;
+import mia.codeutils.features.parameters.impl.InternalBooleanDataField;
 
 import java.util.ArrayList;
 
@@ -11,7 +12,7 @@ public abstract class Feature {
     protected String id, name, description;
     protected Category category;
     private final ArrayList<ParameterDataField<?>> parameterDataFields;
-    private final BooleanDataField enabledParameter;
+    private final InternalBooleanDataField enabledParameter;
 
     public Feature(Categories category, String name, String id, String description) {
         this.id = id;
@@ -19,7 +20,7 @@ public abstract class Feature {
         this.description = description;
         this.parameterDataFields = new ArrayList<>();
 
-        enabledParameter = new BooleanDataField("Enabled", ParameterIdentifier.of(this, "enabled"), true, false);
+        enabledParameter = new InternalBooleanDataField("Enabled", ParameterIdentifier.of(this, "enabled"), true, false);
 
         category.getCategory().addFeature(this);
     }

@@ -77,6 +77,7 @@ public class Mod implements ClientModInitializer {
 		WorldRenderEvents.END_MAIN.register(context -> {
 			HudMatrixRegistry.register(context);
 			FeatureManager.implementFeatureListener(WorldRenderEventListener.class, feature -> { feature.WorldRenderEvents_END_MAIN(context); });
+
 		});
 		WorldRenderEvents.BEFORE_TRANSLUCENT.register(context -> {FeatureManager.implementFeatureListener(WorldRenderEventListener.class, feature -> { feature.WorldRenderEvents_BEFORE_TRANSLUCENT(context); });});
 
