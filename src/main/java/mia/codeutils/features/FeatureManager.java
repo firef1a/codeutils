@@ -1,9 +1,6 @@
 package mia.codeutils.features;
 
-import mia.codeutils.features.impl.development.CPUDisplay;
-import mia.codeutils.features.impl.development.CodeSignColorer;
-import mia.codeutils.features.impl.development.ItemTagViewer;
-import mia.codeutils.features.impl.development.SignPeek;
+import mia.codeutils.features.impl.development.*;
 import mia.codeutils.features.impl.development.chest_previewer.ChestViewer;
 import mia.codeutils.features.impl.development.scanner.PlotLoader;
 import mia.codeutils.features.impl.development.scanner.PlotScanner;
@@ -11,6 +8,7 @@ import mia.codeutils.features.impl.general.AutoTip;
 import mia.codeutils.features.impl.general.chat.SimplifiedStaffChatTags;
 import mia.codeutils.features.impl.general.title.JoinButton;
 import mia.codeutils.features.impl.internal.ConfigScreenFeature;
+import mia.codeutils.features.impl.internal.PermissionTracker;
 import mia.codeutils.features.impl.internal.commands.CommandAliaser;
 import mia.codeutils.features.impl.internal.commands.CommandScheduler;
 import mia.codeutils.features.impl.internal.mode.LocationAPI;
@@ -60,6 +58,7 @@ public final class FeatureManager {
         add(new ItemTagViewer(Categories.DEV));
         add(new PlotLoader(Categories.DEV));
         add(new PlotScanner(Categories.DEV));
+        add(new ItemLorePeeker(Categories.DEV));
 
         add(new AutoQueue(Categories.SUPPORT));
         add(new SupportHUD(Categories.SUPPORT));
@@ -81,6 +80,9 @@ public final class FeatureManager {
         add(new VanishTracker(Categories.INTERNAL));
         add(new LocationAPI(Categories.INTERNAL));
         add(new VerboseLogger(Categories.INTERNAL));
+
+
+        add(new PermissionTracker(Categories.INTERNAL));
     }
 
     private static void add(Feature feature) {

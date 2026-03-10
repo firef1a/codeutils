@@ -86,7 +86,7 @@ public final class ChestViewer extends Feature implements RenderHUD, PacketListe
 
             if (blockState instanceof ChestBlockEntity) {
                 if (currentChestPos != null && currentChestPos.equals(blockPos) && overlayTextList != null) {
-                    DrawContextHelper.drawTooltip(context, overlayTextList, Mod.getScaledWindowWidth() / 2, Mod.getScaledWindowHeight() / 2, true);
+                    DrawContextHelper.drawTooltip(context, overlayTextList, Mod.getScaledWindowWidth() / 2, Mod.getScaledWindowHeight() / 2, 0.5f);
                 }
 
                 if ((currentChestPos != null && !lastBlockPos.equals(blockPos) && !currentChestPos.equals(blockPos)) || lastBlockPos == null) {

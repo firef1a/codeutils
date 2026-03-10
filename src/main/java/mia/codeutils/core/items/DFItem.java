@@ -4,17 +4,18 @@ import mia.codeutils.Mod;
 import mia.codeutils.core.Base64Utils;
 import mia.codeutils.core.GzipUtils;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.component.ItemLore;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -227,6 +228,34 @@ public class DFItem {
         DFItem dfItem = DFItem.of(template);
         dfItem.editData(data -> data.setHypercubeStringValue("codetemplatedata", "{\"author\":\"" + Mod.MOD_ID +"\",\"name\":\"Template to be placed\",\"version\":1,\"code\":\"" + code + "\"}"));
         return dfItem.getItemStack();
+    }
+
+
+    public Optional<HashMap<String, Tag>> getHypercubeItemTags(boolean ignoreInternalTags) {
+        HashMap<String, Tag> hypercubeTags = new HashMap<>();
+        CustomData data = this.item.getComponents().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        Set<Map.Entry<String, Tag>> dataSet = data.copyTag().entrySet();
+
+        Tag publicBukkitValues = null;
+        for (Map.Entry<String, Tag> entry : dataSet) {
+            if (entry.getKey().equals("PublicBukkitValues")) {
+                publicBukkitValues = entry.getValue();
+                break;
+            }
+        }
+
+        if (publicBukkitValues != null) {
+            Optional<CompoundTag> tag = publicBukkitValues.asCompound();
+            if (tag.isPresent()) {
+                for (Map.Entry<String, Tag> entry : tag.get().entrySet()) {
+                    String key = entry.getKey().substring(10); // chops off "hypercube:";
+                    if (List.of("varitem", "item_instance", "codetemplatedata").contains(key) && ignoreInternalTags) continue;
+                    hypercubeTags.put(key, entry.getValue());
+                }
+            }
+            return Optional.of(hypercubeTags);
+        }
+        return Optional.empty();
     }
 
     public static String serializeTemplateJSON(String jsonData) throws IOException {

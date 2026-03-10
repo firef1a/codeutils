@@ -62,7 +62,7 @@ public class Mod implements ClientModInitializer {
                  \\___  >____/\\____ |\\___  >____/ |__| |__|____/____  >
                      \\/           \\/    \\/                         \\/\s
                      
-											   now in COLOR!
+															   now in color
                 """);
 	}
 
@@ -122,11 +122,13 @@ public class Mod implements ClientModInitializer {
 
 	private static void message(Component message, int mia, int main) {
 		if (Mod.MC.player == null) return;
-		Mod.MC.player.displayClientMessage(Component.empty()
-						.append(Component.literal(MOD_ID + " ").withColor(mia))
-						.append(Component.literal("᛬ ").withColor(0x9c9c9c))
-						.append(message.copy().withColor(main))
-				, false);
+		Mod.MC.execute(() -> {
+			Mod.MC.player.displayClientMessage(Component.empty()
+				.append(Component.literal(MOD_ID + " ").withColor(mia))
+				.append(Component.literal("᛬ ").withColor(0x9c9c9c))
+				.append(message.copy().withColor(main)), false);
+		});
+
 	}
 
 	public static void message(Component message) {

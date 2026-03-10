@@ -22,10 +22,13 @@ public class DrawContextHelper {
     public static void drawText(GuiGraphics context, Component text, int x, int y, float alpha, boolean shadow) {
         context.drawString(Mod.MC.font, text, x, y, ARGB.getARGB(ColorBank.WHITE, alpha), shadow);
     }
-    public static void drawTooltip(GuiGraphics context, Component text, int x, int y, boolean yCentered) {
-        drawTooltip(context, List.of(text), x, y, yCentered);
+    public static void drawTooltip(GuiGraphics context, Component text, int x, int y, float yAnchor) {
+        drawTooltip(context, List.of(text), x, y, yAnchor);
     }
-    public static void drawTooltip(GuiGraphics context, List<Component> list, int x, int y, boolean yCentered) {
+
+
+    // yAnchor: a value of 0.5 will center it around y and a value of 1 will make it render above y
+    public static void drawTooltip(GuiGraphics context, List<Component> list, int x, int y, float yAnchor) {
         int baseWidth = 0;
         int baseHeight = (list.size() * Mod.MC.font.lineHeight) + ((list.size()-1) * 2);
         for (Component text : list) {
@@ -35,7 +38,7 @@ public class DrawContextHelper {
 
         int margin = 3;
         int baseX = x + 6;
-        int baseY = y - (yCentered ? (baseHeight / 2) + margin : 0);
+        int baseY = (int) (y - (yAnchor * (baseHeight + (2 * margin))));
         int width = baseWidth + margin * 2;
         int height = baseHeight + margin * 2;
 

@@ -63,10 +63,12 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
             sessionBuilder = new SessionEntry(matcher.group(1), Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3)) ,Integer.parseInt(matcher.group(4)));
         }
 
-        matcher = Pattern.compile("^ {2}▶ Reason: ([A-Za-z0-9_]*)").matcher(text);
+        matcher = Pattern.compile("^ {2}▶ Reason: (.*)").matcher(text);
         if (matcher.find()) {
-            sessionBuilder.setReason(matcher.group(1));
-            sessionQueue.put(sessionBuilder.name, sessionBuilder);
+            if (sessionBuilder != null) {
+                sessionBuilder.setReason(matcher.group(1));
+                sessionQueue.put(sessionBuilder.name, sessionBuilder);
+            }
         }
 
 

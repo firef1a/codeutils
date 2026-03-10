@@ -5,6 +5,7 @@ import mia.codeutils.Mod;
 import mia.codeutils.core.KeyBindCategories;
 import mia.codeutils.core.KeyBindManager;
 import mia.codeutils.core.MiaKeyBind;
+import mia.codeutils.core.items.DFItem;
 import mia.codeutils.features.Categories;
 import mia.codeutils.features.Feature;
 import mia.codeutils.features.impl.internal.mode.LocationAPI;
@@ -26,6 +27,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
 
@@ -43,8 +45,6 @@ public final class ItemTagViewer extends Feature implements RenderTooltip, Regis
     private static final Component tagText = Component.literal("› ").withColor(ColorBank.MC_GRAY).append(Component.literal("Tags:").withColor(ColorBank.WHITE));
     private static final Component delimiterText = Component.literal(" : ").withColor(ColorBank.MC_DARK_GRAY);
 
-    public static final DataComponentType<CustomData> CUSTOM_DATA_DATA_COMPONENT_TYPE = DataComponents.CUSTOM_DATA;
-
     public ItemTagViewer(Categories category) {
         super(category, "Item Tag Viewer", "itemtagviewer", "Shows hypercube item tags while in dev mode.");
         regularKeyColor = new ColorDataField("Tag Key Color", ParameterIdentifier.of(this, "tag_key_color"), new Color(0xeebdff), true);
@@ -56,58 +56,53 @@ public final class ItemTagViewer extends Feature implements RenderTooltip, Regis
         });
     }
 
-
-    @Override
-    public void tooltip(ItemStack item, Item.TooltipContext context, TooltipFlag type, List<Component> textList) {
+    public static List<Component> getItemLoreWithTags(ItemStack item) {
         //if (!LocationAPI.getMode().canViewCode()) return;
+        Optional<HashMap<String,Tag>> hypercubeTags = new DFItem(item).getHypercubeItemTags(true);
+        ArrayList<Component> loreLines = new ArrayList<>();
 
-        CustomData data = item.getComponents().getOrDefault(CUSTOM_DATA_DATA_COMPONENT_TYPE, CustomData.EMPTY);
-        Set<Map.Entry<String, Tag>> dataSet = data.copyTag().entrySet();
+        if (hypercubeTags.isPresent()) {
+            for (Map.Entry<String, Tag> entry : hypercubeTags.get().entrySet()) {
+                String key = entry.getKey();
+                if (List.of("varitem", "item_instance", "codetemplatedata").contains(key)) continue;
+                Tag rawValue = entry.getValue();
 
-        Tag publicBukkitValues = null;
-        for (Map.Entry<String, Tag> entry : dataSet) {
-            if (entry.getKey().equals("PublicBukkitValues")) {
-                publicBukkitValues = entry.getValue();
-                break;
-            }
-        }
+                Component valueEntry = null;
+                if (rawValue.asString().isPresent()) {
+                    valueEntry = Component.literal(rawValue.asString().get()).withColor(stringValueColor.getRGB());
+                } else if (rawValue.asFloat().isPresent()) {
+                    valueEntry = Component.literal(String.valueOf(rawValue.asFloat().get())).withColor(numberValueColor.getRGB());
+                }
 
-        ArrayList<Component> hypercubeTags = new ArrayList<>();
-        if (publicBukkitValues != null) {
-            Optional<CompoundTag> tag = publicBukkitValues.asCompound();
-            if (tag.isPresent()) {
-                for (Map.Entry<String, Tag> entry : tag.get().entrySet()) {
-                    String rawKey = entry.getKey().substring(10); // chops off "hypercube:"
-                    if (List.of("varitem", "item_instance", "codetemplatedata").contains(rawKey)) continue;
-                    Tag rawValue = entry.getValue();
-
-                    Component valueEntry = null;
-                    if (rawValue.asString().isPresent()) {
-                        valueEntry = Component.literal(rawValue.asString().get()).withColor(stringValueColor.getRGB());
-                    } else if (rawValue.asFloat().isPresent()) {
-                        valueEntry = Component.literal(String.valueOf(rawValue.asFloat().get())).withColor(numberValueColor.getRGB());
-                    }
-
-                    if (valueEntry != null) {
-                        hypercubeTags.add(
-                                Component.literal(rawKey).withColor(regularKeyColor.getRGB())
-                                        .append(
-                                                delimiterText.copy().
-                                                        append(
-                                                                valueEntry
-                                                        )
-                                        )
-                        );
-                    }
+                if (valueEntry != null) {
+                    loreLines.add(
+                            Component.literal(key).withColor(regularKeyColor.getRGB())
+                                    .append(
+                                            delimiterText.copy().
+                                                    append(
+                                                            valueEntry
+                                                    )
+                                    )
+                    );
                 }
             }
         }
-        if (!hypercubeTags.isEmpty()) {
-            hypercubeTags.addFirst(tagText.copy());
-            hypercubeTags.addFirst(Component.empty());
-            textList.addAll(hypercubeTags);
+
+        if (!loreLines.isEmpty()) {
+            loreLines.addFirst(tagText.copy());
+            loreLines.addFirst(Component.empty());
         }
+        return loreLines;
     }
+
+
+    @Override
+    public void tooltip(ItemStack item, Item.TooltipContext context, TooltipFlag type, List<Component> textList) {
+        List<Component> tagLore = getItemLoreWithTags(item);
+        textList.addAll(tagLore);
+    }
+
+
 
     @Override
     public void registerKeyBind() {

@@ -56,20 +56,20 @@ public abstract class MTitleScreen extends Screen {
         if (!FeatureManager.getFeature(JoinButton.class).getEnabled()) return;
 
         IconButtonWidget textIconButtonWidget = this.addRenderableWidget(createIconButton((button) -> {
-            connectToServer(JoinButton.getCustomServerAddress(), JoinButton.getCustomServerPort());
+            connectToServer(JoinButton.getCustomServerAddress());
         }));
         textIconButtonWidget.setPosition((this.width / 2) - 100 + 200 + 4, (this.height / 4) + 48);
     }
 
     @Unique
-    private static void connectToServer(String address, int port) {
+    private static void connectToServer(String address) {
         if (Mod.MC.level != null) {
             Mod.MC.level.disconnect(Component.literal("world is null"));
             Mod.MC.disconnectFromWorld(Component.literal("world is null"));
         }
 
-        ServerAddress serverAddress = ServerAddress.parseString(address + ":" + port);
-        ServerData serverInfo = new ServerData(address, address + ":" + port, ServerData.Type.OTHER);
+        ServerAddress serverAddress = ServerAddress.parseString(address);
+        ServerData serverInfo = new ServerData(address, address, ServerData.Type.OTHER);
 
         net.minecraft.client.gui.screens.ConnectScreen.startConnecting(Mod.getCurrentScreen(), Mod.MC, serverAddress, serverInfo, true, null);
     }

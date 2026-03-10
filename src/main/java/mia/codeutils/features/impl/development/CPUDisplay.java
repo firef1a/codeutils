@@ -28,16 +28,20 @@ public final class CPUDisplay extends Feature implements RenderHUD, PacketListen
     private long overlayTimeoutTimestamp = 0L;
     private double animation;
 
+    public DrawRect container = new DrawRect(new Point(10,20), new Point(200,7), 0, new ARGB(0x080808, 0.0f));
+    public DrawText cpuText = new DrawText(new Point(1,-1), Component.empty(), 0, 0, true);
 
     public CPUDisplay(Categories category) {
         super(category, "CPU Display", "cpuwheel", "Displays CPU % as a solid bar, requires other CPU HUDs from other mods (such as CodeClient) to be disabled first.");
+        cpuText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
     }
 
+    public boolean isDisplayed() { return animation > 0; };
 
     @Override
     public void renderHUD(GuiGraphics context, DeltaTracker tickCounter) {
         //context.scissorStack.push(new ScreenRectangle(0,0,500,500));
-        DrawRect container = new DrawRect(new Point(10,20), new Point(200,7), 0, new ARGB(0x080808, 0.0f));
+        container.clearDrawables();
 
         double percentage = 100f * displayCPU;// * (Mth.clamp(displayCPU, 0f, 1f));
 
@@ -50,7 +54,7 @@ public final class CPUDisplay extends Feature implements RenderHUD, PacketListen
         //DrawRect bottomLiner = new DrawOutlineRect(new Point(0,0), new Point(container.getWidth(), 1), 0, new ARGB(0x383838, 0.8f), container);
         //bottomLiner.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
 
-        DrawText cpuText = new DrawText(new Point(1,-1), Component.literal("CPU: ").withColor(ColorBank.WHITE).append(Component.literal(MathUtils.roundToDecimalPlaces(percentage, 3) + "%").withColor(ColorBank.MC_GRAY)), 0, (float) easing, true, container);
+        cpuText = new DrawText(cpuText.getRawPosition(), Component.literal("CPU: ").withColor(ColorBank.WHITE).append(Component.literal(MathUtils.roundToDecimalPlaces(percentage, 3) + "%").withColor(ColorBank.MC_GRAY)), 0, (float) easing, true, container);
         cpuText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
 
         if (System.currentTimeMillis() < overlayTimeoutTimestamp) {

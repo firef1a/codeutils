@@ -52,7 +52,7 @@ public final class SignPeek extends Feature implements RenderHUD {
                                 ),
                                 Mod.getScaledWindowWidth() / 2,
                                 Mod.getScaledWindowHeight() / 2,
-                                true
+                                0.5f
                         );
                     }
                 }
