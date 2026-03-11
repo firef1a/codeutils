@@ -7,32 +7,38 @@ import net.minecraft.resources.Identifier;
 import java.util.Random;
 
 public class MiaKeyBind extends KeyMapping {
-    private long lastLastPressed;
     private long lastPressed;
-    private Runnable onToggle;
-
     private long threshold = 100L;
+    public boolean down;
+    public Runnable onKeyDown;
 
     public MiaKeyBind(String translationKey, int code, KeyBindCategories category) {
+        //super(translationKey, code, Category.register(Identifier.fromNamespaceAndPath(Mod.MOD_ID, category.displayName())));
         this(translationKey, code, category, () -> {});
-
     }
 
-    public MiaKeyBind(String translationKey, int code, KeyBindCategories category, Runnable onToggle) {
+    public MiaKeyBind(String translationKey, int code, KeyBindCategories category, Runnable onKeyDown) {
         //super(translationKey, code, Category.register(Identifier.fromNamespaceAndPath(Mod.MOD_ID, category.displayName())));
         super(translationKey, code, Category.register(Identifier.fromNamespaceAndPath("test", "sadf" + Math.random())));
-        this.onToggle = onToggle;
+        this.onKeyDown = onKeyDown;
         lastPressed = 0L;
     }
 
     public void tick() {
-        if (isDown() && (System.currentTimeMillis() - lastLastPressed) > threshold) {
-            onToggle.run();
+        if (isDown() & !down) {
+            down = true;
+            onKeyDown.run();
+        }
+        if (!isDown()){
+            down = false;
         }
     }
 
+    public boolean rawIsDown() {
+        return super.isDown();
+    }
+
     public boolean isDown() {
-        lastLastPressed = lastPressed;
         long currentTime = System.currentTimeMillis();
         long diff = currentTime - lastPressed;
         if (diff < threshold) return true;

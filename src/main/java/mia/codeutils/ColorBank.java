@@ -7,7 +7,8 @@ public class ColorBank {
     public static final int BLACK = CommonColors.BLACK;
 
     public static final int MC_GRAY = CommonColors.LIGHT_GRAY;
-    public static final int MC_DARK_GRAY = CommonColors.GRAY;
+    public static final int MC_DARK_GRAY = CommonColors.GRAY;;
+    public static final int MC_AQUA = CommonColors.HIGH_CONTRAST_DIAMOND;
     public static final int MC_RED = 0xff5555;
     public static final int MC_DARK_RED = 0xff5555;
     public static final int MC_DARK_GREEN = 0x00AA00;

@@ -1,6 +1,10 @@
 package mia.codeutils.mixin.player;
 
+import com.mojang.authlib.minecraft.client.MinecraftClient;
+import mia.codeutils.Mod;
+import mia.codeutils.core.MiaKeyBind;
 import mia.codeutils.features.FeatureManager;
+import mia.codeutils.features.impl.development.SignPeek;
 import mia.codeutils.features.listeners.impl.PlayerUseEventListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -24,5 +28,20 @@ public abstract class MMinecraftClient {
     private void onRightClick(CallbackInfo ci) {
         FeatureManager.implementFeatureListener(PlayerUseEventListener.class, feature -> feature.useItemCallback(player, level, InteractionHand.MAIN_HAND));
 
+    }
+
+    @Inject(method = "handleKeybinds", at = @At("HEAD"), cancellable = true)
+    private void handleCustomKeybind(CallbackInfo ci) {
+        SignPeek signPeek = FeatureManager.getFeature(SignPeek.class);
+        if (Mod.MC.options.keySwapOffhand.isDown()) {
+            if (FeatureManager.hasFeature(SignPeek.class)) {
+                MiaKeyBind getSignPeek = signPeek.getSignName;
+                if (getSignPeek.rawIsDown()) {
+                    getSignPeek.tick();
+                    Mod.MC.options.keySwapOffhand.setDown(false);
+                    ci.cancel();
+                }
+            }
+        }
     }
 }
