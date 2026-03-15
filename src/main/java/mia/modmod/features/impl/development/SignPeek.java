@@ -71,7 +71,7 @@ public final class SignPeek extends Feature implements RenderHUD, TickEvent, Pac
     }
 
     public SignPeek(Categories category) {
-        super( category, "Sign Peek", "signpeek", "sign that ur gay");
+        super( category, "Sign Peek", "signpeek", "sign that ur gay (also press f to grab function header and call names)");
         getSignName = new MiaKeyBind("Get Sign Name", GLFW.GLFW_KEY_F, KeyBindCategories.DEVELOPMENT_CATEGORY, () -> {
             if (!LocationAPI.getMode().canViewCode()) return;
             if (Mod.MC.player == null) return;
