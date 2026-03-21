@@ -2,6 +2,7 @@ package mia.modmod.features.impl.moderation.tracker;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import it.unimi.dsi.fastutil.Hash;
 import mia.modmod.ColorBank;
 import mia.modmod.Mod;
 import mia.modmod.core.MathUtils;
@@ -29,6 +30,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -48,56 +50,15 @@ import java.util.List;
 
 public final class PlayerOutliner extends Feature implements RenderHUD, RegisterCommandListener, ServerConnectionEventListener, WorldRenderEventListener, PacketListener {
     private final ArrayList<String> trackedPlayers;
-    private LinkedHashMap<String, Float> playerColors;
-    private HashMap<String,ArrayList<Long>> playerClicks;
-
-    private static DoubleDataField timestampSpan;
 
     public PlayerOutliner(Categories category) {
         super(category, "Player Outliner", "outliner", "outlines tracked players", new Permissions(SupportPermission.NONE, ModeratorPermission.JR_MOD));
         trackedPlayers = new ArrayList<>();
-        playerColors = new LinkedHashMap<>();
-        playerClicks = new HashMap<>();
 
-        timestampSpan = new DoubleDataField("APS Timespan (seconds)", ParameterIdentifier.of(this, "timespanSpan"), 3.0, true);
-    }
-
-
-    private enum ClickType {
-        LEFT,
-        RIGHT
     }
 
     @Override
-    public void receivePacket(Packet<?> packet, CallbackInfo ci) {
-        if (packet instanceof ClientboundAnimatePacket entityAnimationS2CPacket) {
-            ClientLevel world = Mod.MC.level;
-            if (world == null) return;
-            Entity entity = world.getEntity(entityAnimationS2CPacket.getId());
-
-            if (entity instanceof Player && entity != Mod.MC.player) {
-                Player targetPlayer = (Player) entity;
-                String targetPlayerName = targetPlayer.getName().getString();
-
-                ClickType clickType = null;
-                if ((entityAnimationS2CPacket.getAction() == ClientboundAnimatePacket.SWING_MAIN_HAND)) {
-                    clickType = ClickType.RIGHT;
-                } else if (entityAnimationS2CPacket.getAction()  == ClientboundAnimatePacket.SWING_OFF_HAND) {
-                    clickType = ClickType.LEFT;
-                }
-                if (clickType != null) {
-                    ArrayList<Long> clicks;
-                    if (playerClicks.containsKey(targetPlayerName)) {
-                        clicks = playerClicks.get(targetPlayerName);
-                    } else {
-                        clicks = new ArrayList<>();
-                    }
-                    clicks.add(System.currentTimeMillis());
-                    playerClicks.put(targetPlayerName, clicks);
-                }
-            }
-        }
-    }
+    public void receivePacket(Packet<?> packet, CallbackInfo ci) {}
 
 
     @Override
@@ -111,6 +72,8 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
     }
 
     private void renderTrackerList(GuiGraphics context, DeltaTracker tickCounter) {
+        if (Mod.MC.getConnection() == null) return;
+
         int margin = 5;
         int eachHeight = Mod.MC.font.lineHeight + margin * 2;
         Component titleText = Component.literal("Tracked Players:");
@@ -121,47 +84,12 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         containerTitle.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
         containerTitle.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
-        long currentTS = System.currentTimeMillis();
-
-        if (timestampSpan.getValue() <= 0) {
-            timestampSpan.setValue(1.0);
-            Mod.message(timestampSpan.getName() + " set to double <= 0 -> automatically set to 1.0");
-        }
-        double seconds = timestampSpan.getValue();
-        long period = (long) (seconds * 1000);
         int i = 0;
         for (String player : trackedPlayers) {
             boolean online = StreamUtils.getPlayerList(false).contains(player);
             int onlineColor = online ? ColorBank.MC_GREEN : ColorBank.MC_RED;
 
-            ArrayList<Long> clicks = (ArrayList<Long>) playerClicks.getOrDefault(player, new ArrayList<>()).clone();
-
-            long totalDelta = 0L;
-
-            ArrayList<Long> stamps = new ArrayList<>();
-            int numClicks = 0;
-            for (long ts : clicks) if (ts + period >= currentTS) {
-                long delta = (ts + period) - currentTS;
-                stamps.add(ts);
-                totalDelta += delta;
-                numClicks++;
-            }
-
-            double averageDeltaDelta = 0.0;
-            if (stamps.size() > 2) {
-                long totaldiff = 0L;
-                for (int j = 1; j < stamps.size(); j++) {
-                    long diff = stamps.get(j) - stamps.get(j-1);
-                    totaldiff += diff;
-                }
-                averageDeltaDelta = ((double) (totaldiff)) / (stamps.size()-1);
-            }
-
-
-            String aps = "μ:" + MathUtils.roundToDecimalPlaces(((double) numClicks) / seconds, 2);
-            String sd = "Δ:" + MathUtils.roundToDecimalPlaces(averageDeltaDelta, 1) + "ms";
-
-            Component playerText = Component.literal(player + " ").withColor(0xed7aff).append(Component.literal(aps + " " + sd + " ").withColor(ColorBank.WHITE_GRAY)).append(Component.literal(online ? "online" : "offline").withColor(onlineColor));
+            Component playerText = Component.literal(player + " ").withColor(0xed7aff).append(getLatencyText(player)).append(Component.literal(" " + (online ? "online" : "offline")).withColor(onlineColor));
             DrawRect playerContainer = new DrawRect(new Point(0,(eachHeight+1) * (i + 1)), new Point(Mod.MC.font.width(playerText.getString()) + (margin + 1) * 2, eachHeight), 0, new ARGB(ColorBank.BLACK, 0.6f), container);
             DrawRect playerContainerSide = new DrawRect(new Point(0,0), new Point(2, playerContainer.getHeight()), 0, new ARGB(onlineColor, 1f), playerContainer);
             DrawText playerTitle = new DrawText(new Point(margin + 2,0), playerText, 0, 1f,false, playerContainer);
@@ -206,6 +134,9 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
 
     // Need to readd rainbow outline functionality
     public void renderPlayerOutline(GuiGraphics context, Player playerEntity, DeltaTracker tickCounter) {
+        if (Mod.MC.getConnection() == null) return;
+        String playerName = playerEntity.getPlainTextName();
+
         ArrayList<Double> xCords = new ArrayList<>();
         ArrayList<Double> yCords = new ArrayList<>();
         List<Vec3> boundingBox = RenderContextHelper.getBoundingBoxCorners(playerEntity);
@@ -225,18 +156,13 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         int boundingWidth = (int) (screenBoundingBox.getXsize() + margin * 2);
         int boundingHeight = (int) (screenBoundingBox.getYsize() + margin * 2);
 
-
-        String playerName = playerEntity.getName().getString();
-        if (!playerColors.containsKey(playerName)) playerColors.put(playerName, (float) Math.random());
-        int purpleRGB = Color.HSBtoRGB(playerColors.get(playerName), 0.5f , 1f);
-        ARGB purple = new ARGB(0xed7aff, 1.0f);
-        ARGB fadedPurple = new ARGB(purple.getRGB(), 0.8f);
+        int purpleInt = 0xed7aff;
+        ARGB fadedPurple = new ARGB(purpleInt, 0.8f);
         boolean isRainbow = false;
 
         int period = 5;
         long phase = 500L;
 
-        ARGB c1 = isRainbow ? ARGB.getRainbowARGB(0+phase, period) : purple;
         /*
         ARGB c2 = isRainbow ? ARGB.getRainbowARGB(100L+phase, period) : purple;
         ARGB c3 = isRainbow ? ARGB.getRainbowARGB(200L+phase, period) : purple;
@@ -256,16 +182,37 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         int labelRectMargin = 2;
         int labelRectHeight = Mod.MC.font.lineHeight + labelRectMargin * 2;
 
-        Component labelText = Component.literal(playerEntity.getName().getString()).withColor(ColorBank.WHITE);
+
+        Component labelText = Component.literal(playerEntity.getName().getString() + " ").withColor(ColorBank.WHITE).append(getLatencyText(playerName));
 
         DrawRect labelRect = new DrawRect(new Point(x, y - labelRectHeight), new Point(Mod.MC.font.width(labelText.getString()) + labelRectMargin*2, labelRectHeight), 0, fadedPurple);
         DrawText labelDrawText = new DrawText(new Point(labelRectMargin, 0), labelText, 0, 1f, true, labelRect);
         labelDrawText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
         labelDrawText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
-        DrawContextHelper.drawRectBorder(context, x, y, width, height, c1);
+        DrawContextHelper.drawRectBorder(context, x, y, width, height, new ARGB(purpleInt, 1.0f));
+        DrawRect shaded = new DrawRect(new Point(x, y), new Point(width, height), 0, new ARGB(purpleInt, 0.4f));
+        shaded.render(context, 0, 0);
 
         labelRect.render(context, 0, 0);
+    }
+
+    public Component getLatencyText(String playerName) {
+        HashMap<String, PlayerInfo> playerInfoHashMap = new HashMap<>();
+        Mod.MC.getConnection().getOnlinePlayers().forEach((playerInfo -> {
+            playerInfoHashMap.put(playerInfo.getProfile().name(), playerInfo);
+        }));
+
+        int latency = 0;
+        if (playerInfoHashMap.containsKey(playerName)) latency = playerInfoHashMap.get(playerName).getLatency();
+
+        int color = 0x59ff5f;
+        if (latency > 50) color = 0xa1ff59;
+        if (latency > 100) color = 0xc5ff59;
+        if (latency > 150) color = 0xffc859;
+        if (latency > 200) color = 0xff6759;
+        if (latency > 500) color = 0xff4230;
+        return Component.literal(latency + "ms").withColor(color);
     }
 
     public static void addTrackedPlayer(String name) {

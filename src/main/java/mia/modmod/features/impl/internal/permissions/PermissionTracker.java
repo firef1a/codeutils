@@ -180,7 +180,6 @@ public final class PermissionTracker extends Feature implements ServerConnection
 
     @Override
     public void DFConnectJoin(ClientPacketListener networkHandler) {
-        DFRanksData.setValue(List.of());
         if (Mod.MC.level != null) {
             if (Mod.MC.player != null) {
                 if (DFRanksData.getValue().isEmpty()) {
