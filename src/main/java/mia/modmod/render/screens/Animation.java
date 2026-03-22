@@ -6,12 +6,12 @@ import java.util.function.Function;
 
 public class Animation {
     private AnimationStage animationStage;
-    private float animation;
+    private float progress;
     private final Function<Float, Float> easingFunction;
 
-    public Animation(AnimationStage animationStage, float animation, Function<Float, Float> easingFunction) {
+    public Animation(AnimationStage animationStage, float progress, Function<Float, Float> easingFunction) {
         this.animationStage = animationStage;
-        this.animation = animation;
+        this.progress = progress;
         this.easingFunction = easingFunction;
     }
 
@@ -19,19 +19,19 @@ public class Animation {
         this.animationStage = animationStage;
     }
     public void setAnimation(float animation) {
-        this.animation = animation;
+        this.progress = animation;
     }
 
     public AnimationStage getAnimationStage() {
         return this.animationStage;
     }
-    public float getAnimation() {
-        return easingFunction.apply(this.animation);
+    public float getProgress() {
+        return easingFunction.apply(this.progress);
     }
 
     public void updateAnimation(float delta) {
-        this.animation = Mth.clamp(animation + (delta * animationStage.direction), 0f, 1f);
-        if (animation == 1 && animationStage.equals(AnimationStage.OPENING)) animationStage = AnimationStage.OPEN;
-        if (animation == 0 && animationStage.equals(AnimationStage.CLOSING)) animationStage = AnimationStage.CLOSED;
+        this.progress = Mth.clamp(progress + (delta * animationStage.direction), 0f, 1f);
+        if (progress == 1 && animationStage.equals(AnimationStage.OPENING)) animationStage = AnimationStage.OPEN;
+        if (progress == 0 && animationStage.equals(AnimationStage.CLOSING)) animationStage = AnimationStage.CLOSED;
     }
 }

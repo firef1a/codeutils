@@ -43,6 +43,7 @@ public class EnumDataField<T extends Enum> extends ParameterDataField<T> {
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "deprecation"})
     public void addYACLParameter(OptionGroup.Builder featureGroup) {
         featureGroup.option(
                 Option.createBuilder(Enum.class)

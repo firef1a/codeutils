@@ -15,6 +15,7 @@ import mia.modmod.features.impl.internal.server.ServerManager;
 import mia.modmod.features.impl.internal.staff.VanishTracker;
 import mia.modmod.features.impl.internal.superdupertopsecrte.VerboseLogger;
 import mia.modmod.features.impl.moderation.BetterVanishMSG;
+import mia.modmod.features.impl.moderation.ModQA;
 import mia.modmod.features.impl.moderation.VanishFly;
 import mia.modmod.features.impl.moderation.reports.clickonreportsinchattoteleporttothem;
 import mia.modmod.features.impl.moderation.tracker.HitRange;
@@ -65,6 +66,7 @@ public final class FeatureManager {
         add(new clickonreportsinchattoteleporttothem(Categories.MODERATION));
         add(new HitRange(Categories.MODERATION));
         add(new PlayerOutliner(Categories.MODERATION));
+        add(new ModQA(Categories.MODERATION));
 
         initInternalFeatures();
 

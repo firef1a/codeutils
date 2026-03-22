@@ -27,6 +27,13 @@ public class Point {
     }
 
 
+    public Point sub(int x, int y) {
+        return new Point(this.x - x, this.y - y);
+    }
+    public Point sub(Point point) {
+        return new Point(point.x - x, point.y - y);
+    }
+
     public Point mul(double x, double y) {
         return new Point((int) (this.x * x), (int) (this.y * y));
     }

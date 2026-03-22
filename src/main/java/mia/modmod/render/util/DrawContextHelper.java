@@ -4,7 +4,10 @@ import mia.modmod.ColorBank;
 import mia.modmod.Mod;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.PlayerSkin;
 
 import java.util.List;
 
@@ -55,6 +58,30 @@ public class DrawContextHelper {
 
     public static void addGUIElement(GuiGraphics context, GuiElementRenderState elementRenderState) {
         context.guiRenderState.submitGuiElement(elementRenderState);
+    }
+
+    public static void drawPlayerHead(GuiGraphics context, PlayerSkin playerSkin, int x, int y, int size) {
+        context.blit(
+                RenderPipelines.GUI_TEXTURED,
+                playerSkin.body().texturePath(),
+                x, y, // blit x y
+                8, 8, // u, v
+                size, size, // blit size
+                8, 8, // blit area
+                64, 64, // texture size
+                -1
+        );
+        // draw layer1
+        context.blit(
+                RenderPipelines.GUI_TEXTURED,
+                playerSkin.body().texturePath(),
+                x-1, y-1,
+                8 * 5, 8,
+                size+2, size+2,
+                8, 8,
+                64, 64,
+                -1
+        );
     }
 }
 

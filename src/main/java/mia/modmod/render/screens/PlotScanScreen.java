@@ -42,7 +42,7 @@ public class PlotScanScreen extends Screen {
 
     private void draw(GuiGraphics context, int mouseX, int mouseY) {
         // top
-        float animationScale = animation.getAnimation();
+        float animationScale = animation.getProgress();
         buttons = new ArrayList<>();
 
         Point screenSize = new Point(Mod.getScaledWindowWidth(), Mod.getScaledWindowHeight());

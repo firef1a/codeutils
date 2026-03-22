@@ -3,6 +3,7 @@ package mia.modmod.features.impl.moderation.reports;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import mia.modmod.ColorBank;
+import mia.modmod.Mod;
 import mia.modmod.features.Categories;
 import mia.modmod.features.Feature;
 import mia.modmod.features.impl.internal.commands.CommandScheduler;
@@ -76,19 +77,12 @@ public final class clickonreportsinchattoteleporttothem extends Feature implemen
                         String player_name = StringArgumentType.getString(commandContext, "player_name");
                         String node_id = StringArgumentType.getString(commandContext, "node_id");
 
-                        /*
-                        PlayerOutliner playerOutliner = FeatureManager.getFeature(PlayerOutliner.class);
-                        if (playerOutliner.getEnabled()) {
-                            playerOutliner.trackPlayer(player_name);
-                        }
-
-                         */
-
+                    PlayerOutliner.addTrackedPlayer(player_name);
                         CommandScheduler.addCommand(new ScheduledCommand("preference mod_vanish true"));
                         CommandScheduler.addCommand(new ScheduledCommand("server " + node_id));
                         CommandScheduler.addCommand(new ScheduledCommand("tp " + player_name, 250L));
-                        PlayerOutliner.addTrackedPlayer(player_name);
                         if (runalts.getValue()) CommandScheduler.addCommand(new ScheduledCommand("alts " + player_name));
+
 
                         return 1;
                     })

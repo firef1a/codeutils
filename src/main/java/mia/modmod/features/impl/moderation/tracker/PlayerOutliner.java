@@ -1,5 +1,6 @@
 package mia.modmod.features.impl.moderation.tracker;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import it.unimi.dsi.fastutil.Hash;
@@ -25,28 +26,45 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.PlayerSkinWidget;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import net.kyori.adventure.text.serializer.ComponentSerializer;
 
 public final class PlayerOutliner extends Feature implements RenderHUD, RegisterCommandListener, ServerConnectionEventListener, WorldRenderEventListener, PacketListener {
     private final ArrayList<String> trackedPlayers;
@@ -89,15 +107,43 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
             boolean online = StreamUtils.getPlayerList(false).contains(player);
             int onlineColor = online ? ColorBank.MC_GREEN : ColorBank.MC_RED;
 
-            Component playerText = Component.literal(player + " ").withColor(0xed7aff).append(getLatencyText(player)).append(Component.literal(" " + (online ? "online" : "offline")).withColor(onlineColor));
-            DrawRect playerContainer = new DrawRect(new Point(0,(eachHeight+1) * (i + 1)), new Point(Mod.MC.font.width(playerText.getString()) + (margin + 1) * 2, eachHeight), 0, new ARGB(ColorBank.BLACK, 0.6f), container);
-            DrawRect playerContainerSide = new DrawRect(new Point(0,0), new Point(2, playerContainer.getHeight()), 0, new ARGB(onlineColor, 1f), playerContainer);
-            DrawText playerTitle = new DrawText(new Point(margin + 2,0), playerText, 0, 1f,false, playerContainer);
+            HashMap<String, PlayerInfo> playerInfoHashMap = new HashMap<>();
+            Mod.MC.getConnection().getOnlinePlayers().forEach((playerInfo -> {
+                playerInfoHashMap.put(playerInfo.getProfile().name(), playerInfo);
+            }));
+
+            Component playerText = Component.literal(player + " ").withColor(0xed7aff).append(online ? getLatencyText(player) : Component.literal("0ms").withColor(ColorBank.MC_GRAY)).append(Component.literal(" " + (online ? "online" : "offline")).withColor(onlineColor));
+
+            Point playerContainerPosition = container.getPosition().add(new Point(0,(eachHeight+1) * (i + 1)));
+            Point playerContainerSize = new Point(Mod.MC.font.width(playerText.getString()) + (margin + 1) * 2, eachHeight);
+
+            Point playerContainerSideSize =  new Point(2, playerContainerSize.y());
+
+            int titleOffset = 0;
+            int headMarginX = margin;
+            int headSize = (int) (playerContainerSize.y() * 0.60);
+            int headX = playerContainerPosition.x()+ playerContainerSideSize.x() + headMarginX;
+            int headY = playerContainerPosition.y() + (playerContainerSize.y() / 2) - (headSize / 2);
+            if (playerInfoHashMap.containsKey(player)) {
+                titleOffset = headSize + headMarginX;
+            }
+            playerContainerSize = playerContainerSize.add(titleOffset, 0);
+
+            DrawRect playerContainer = new DrawRect(playerContainerPosition, playerContainerSize, 0, new ARGB(ColorBank.BLACK, 0.6f));
+            DrawRect playerContainerSide = new DrawRect(new Point(0,0), playerContainerSideSize, 0, new ARGB(onlineColor, 1f), playerContainer);
+            DrawText playerTitle = new DrawText(new Point(margin + playerContainerSide.getWidth() + titleOffset,0), playerText, 0, 1f,false, playerContainer);
             playerTitle.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
             playerTitle.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
+
+            playerContainer.render(context,0,0);
+            if (playerInfoHashMap.containsKey(player)) {
+                PlayerInfo playerInfo = playerInfoHashMap.get(player);
+                // draw layer0
+                DrawContextHelper.drawPlayerHead(context, playerInfo.getSkin(), headX, headY, headSize);
+            }
+
             i++;
         }
-
 
         if (!trackedPlayers.isEmpty()) container.render(context, 0, 0);
     }
@@ -216,7 +262,7 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
     }
 
     public static void addTrackedPlayer(String name) {
-        if (!FeatureManager.getFeature(PlayerOutliner.class).trackedPlayers.contains(name)) FeatureManager.getFeature(PlayerOutliner.class).trackedPlayers.add(name);
+        if (!FeatureManager.getFeature(PlayerOutliner.class).trackedPlayers.contains(name)) FeatureManager.getFeature(PlayerOutliner.class).trackedPlayers.addFirst(name);
     }
 
     @Override
@@ -244,7 +290,7 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
                                     trackedPlayers.remove(username);
                                     Mod.message("Tracker List: Removed " + username);
                                 } else {
-                                    trackedPlayers.add(username);
+                                    trackedPlayers.addFirst(username);
                                     Mod.message("Tracker List: Added " + username);
                                 }
                             }
