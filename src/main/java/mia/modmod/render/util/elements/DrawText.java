@@ -13,14 +13,13 @@ public class DrawText extends DrawObject {
     private boolean shadow;
     private float alpha;
 
-    public DrawText(Point position, Component text, int z, float alpha, boolean shadow) {
-        this(position, text, z, alpha, shadow, null);
+    public DrawText(Point position, Component text, float alpha, boolean shadow) {
+        this(position, text, alpha, shadow, null);
     }
 
-    public DrawText(Point position, Component text, int z, float alpha, boolean shadow, DrawObject parent) {
+    public DrawText(Point position, Component text, float alpha, boolean shadow, DrawObject parent) {
         this.position = position;
         this.text = text;
-        this.z = z;
         this.alpha = alpha;
         this.shadow = shadow;
         if (parent != null) parent.addDrawable(this);

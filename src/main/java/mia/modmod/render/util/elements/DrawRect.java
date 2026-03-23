@@ -10,14 +10,13 @@ import java.util.ArrayList;
 public class DrawRect extends DrawObject {
     protected final ARGB color;
 
-    public DrawRect(Point position, Point size, int z, ARGB color) {
-        this(position, size, z, color, null);
+    public DrawRect(Point position, Point size, ARGB color) {
+        this(position, size, color, null);
     }
 
-    public DrawRect(Point position, Point size, int z, ARGB color, DrawObject parent) {
+    public DrawRect(Point position, Point size, ARGB color, DrawObject parent) {
         this.position = position;
         this.size = size;
-        this.z = z;
         this.color = color;
         if (parent != null) parent.addDrawable(this);
         this.drawables = new ArrayList<>();

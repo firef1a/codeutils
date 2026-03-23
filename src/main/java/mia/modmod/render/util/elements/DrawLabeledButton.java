@@ -8,14 +8,14 @@ import net.minecraft.network.chat.Component;
 
 public class DrawLabeledButton extends DrawButton {
 
-    public DrawLabeledButton(Point position, Point size, Component text, int z, boolean shadow, ARGB disabledColor, ARGB enabledColor) {
-        this(position, size, text, z, shadow, disabledColor, enabledColor, null);
+    public DrawLabeledButton(Point position, Point size, Component text, boolean shadow, ARGB disabledColor, ARGB enabledColor) {
+        this(position, size, text, shadow, disabledColor, enabledColor, null);
     }
 
-    public DrawLabeledButton(Point position, Point size, Component text, int z, boolean shadow, ARGB disabledColor, ARGB enabledColor, DrawObject parent) {
-        super(position, size, z ,disabledColor, enabledColor, parent);
+    public DrawLabeledButton(Point position, Point size, Component text, boolean shadow, ARGB disabledColor, ARGB enabledColor, DrawObject parent) {
+        super(position, size, disabledColor, enabledColor, parent);
 
-        DrawText label = new DrawText(new Point(0, 0), text, 0, 1f, shadow, this);
+        DrawText label = new DrawText(new Point(0, 0), text, 1f, shadow, this);
         label.setParentBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
         label.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
         addDrawable(label);

@@ -58,10 +58,10 @@ public class ModQAScreen extends Screen {
         int buttonColor = 0x1f1f1f;
         int enabledColor = 0x3d3d3d;
 
-        DrawRect mainContainer = new DrawRect(screen.mul(0.5, 0.5).add((int)(50*(1-animation.getProgress())),0), new Point(mainContainerWidth, mainContainerHeight), 0, new ARGB(ColorBank.BLACK, 0.3f * animation.getProgress()));
+        DrawRect mainContainer = new DrawRect(screen.mul(0.5, 0.5).add((int)(50*(1-animation.getProgress())),0), new Point(mainContainerWidth, mainContainerHeight),  new ARGB(ColorBank.BLACK, 0.3f * animation.getProgress()));
         mainContainer.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
 
-        DrawRect sidebarContainer = new DrawRect(Point.ZERO, new Point(100, mainContainerHeight), 0, new ARGB(mainColor, 0.4f * animation.getProgress()), mainContainer);
+        DrawRect sidebarContainer = new DrawRect(Point.ZERO, new Point(100, mainContainerHeight), new ARGB(mainColor, 0.4f * animation.getProgress()), mainContainer);
         final DrawCustomToolTip[] customToolTip = new DrawCustomToolTip[1];
 
 
@@ -74,7 +74,6 @@ public class ModQAScreen extends Screen {
                 DrawButton playerContainer = new DrawButton(
                         new Point(0, (playerContainerSize.y() + 1) * i),
                         playerContainerSize,
-                        0,
                         new ARGB(playerName.equals(selectedPlayer) ? enabledColor : buttonColor, 1f * animation.getProgress()),
                         new ARGB(enabledColor, 1f * animation.getProgress()),
                         sidebarContainer
@@ -90,20 +89,20 @@ public class ModQAScreen extends Screen {
                     setSelectedPlayer(playerName);
                 });
                 buttons.add(playerContainer);
-                DrawText playerNameText = new DrawText(new Point(playerNameMargin, 0), Component.literal(playerName), 0, animation.getProgress(), true, playerContainer);
+                DrawText playerNameText = new DrawText(new Point(playerNameMargin, 0), Component.literal(playerName), animation.getProgress(), true, playerContainer);
                 playerNameText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
                 playerNameText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
                 i++;
             }
 
-            DrawRect titleBar = new DrawRect(Point.ZERO, new Point(mainContainer.getWidth() - sidebarContainer.getWidth(), blockSize), 0, new ARGB(mainColor, 0.7f * animation.getProgress()), sidebarContainer);
+            DrawRect titleBar = new DrawRect(Point.ZERO, new Point(mainContainer.getWidth() - sidebarContainer.getWidth(), blockSize), new ARGB(mainColor, 0.7f * animation.getProgress()), sidebarContainer);
             titleBar.setParentBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.NONE));
 
-            DrawText titleBarText = new DrawText(new Point(playerNameMargin, 0), Component.literal(selectedPlayer).withColor(ColorBank.WHITE_GRAY), 0, animation.getProgress(), true, titleBar);
+            DrawText titleBarText = new DrawText(new Point(playerNameMargin, 0), Component.literal(selectedPlayer).withColor(ColorBank.WHITE_GRAY), animation.getProgress(), true, titleBar);
             titleBarText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
             titleBarText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
-            DrawText shiftText = new DrawText(new Point(-playerNameMargin, 0), Component.literal("shift to silent").withColor(ColorBank.MC_GRAY).withStyle(ChatFormatting.ITALIC), 0, animation.getProgress(), true, titleBar);
+            DrawText shiftText = new DrawText(new Point(-playerNameMargin, 0), Component.literal("shift to silent").withColor(ColorBank.MC_GRAY).withStyle(ChatFormatting.ITALIC), animation.getProgress(), true, titleBar);
             shiftText.setParentBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.MIDDLE));
             shiftText.setSelfBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.MIDDLE));
 
@@ -113,26 +112,26 @@ public class ModQAScreen extends Screen {
 
             // ban container
 
-            DrawRect banContainer = new DrawRect(new Point(dividerSize, dividerSize), new Point(punishmentWidth, punishmentHeight), 0, new ARGB(ColorBank.BLACK, 0.3f * animation.getProgress()), titleBar);
+            DrawRect banContainer = new DrawRect(new Point(dividerSize, dividerSize), new Point(punishmentWidth, punishmentHeight), new ARGB(ColorBank.BLACK, 0.3f * animation.getProgress()), titleBar);
             banContainer.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
 
             // mute container
 
-            DrawRect muteContainer = new DrawRect(new Point(dividerSize, 0), new Point(punishmentWidth, punishmentHeight), 0, new ARGB(ColorBank.BLACK, 0.3f * animation.getProgress()), banContainer);
+            DrawRect muteContainer = new DrawRect(new Point(dividerSize, 0), new Point(punishmentWidth, punishmentHeight), new ARGB(ColorBank.BLACK, 0.3f * animation.getProgress()), banContainer);
             muteContainer.setParentBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.NONE));
 
             // titles
 
-            DrawRect banContainerTitle = new DrawRect(Point.ZERO, new Point(punishmentWidth, blockSize), 0, new ARGB(ColorBank.BLACK, 0.9f * animation.getProgress()), banContainer);
-            DrawRect muteContainerTitle = new DrawRect(Point.ZERO, new Point(punishmentWidth, blockSize), 0, new ARGB(ColorBank.BLACK, 0.9f * animation.getProgress()), muteContainer);
+            DrawRect banContainerTitle = new DrawRect(Point.ZERO, new Point(punishmentWidth, blockSize), new ARGB(ColorBank.BLACK, 0.9f * animation.getProgress()), banContainer);
+            DrawRect muteContainerTitle = new DrawRect(Point.ZERO, new Point(punishmentWidth, blockSize), new ARGB(ColorBank.BLACK, 0.9f * animation.getProgress()), muteContainer);
 
 
-            DrawText banContainerTitleText = new DrawText(new Point(playerNameMargin, 0), Component.literal("Ban Options"), 0, animation.getProgress(), true, banContainerTitle);
+            DrawText banContainerTitleText = new DrawText(new Point(playerNameMargin, 0), Component.literal("Ban Options"), animation.getProgress(), true, banContainerTitle);
             banContainerTitleText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
             banContainerTitleText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
 
-            DrawText muteContainerTitleText = new DrawText(new Point(playerNameMargin, 0), Component.literal("Warn / Mute Options"), 0, animation.getProgress(), true, muteContainerTitle);
+            DrawText muteContainerTitleText = new DrawText(new Point(playerNameMargin, 0), Component.literal("Warn / Mute Options"), animation.getProgress(), true, muteContainerTitle);
             muteContainerTitleText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
             muteContainerTitleText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
@@ -146,7 +145,7 @@ public class ModQAScreen extends Screen {
                     new Punishment(PunishmentType.BAN, "perm", "Server Exploiting"),
                     new Punishment(PunishmentType.BAN, "3d", "Information Mods"),
                     new Punishment(PunishmentType.BAN, "3d", "Game Exploiting"),
-                    new Punishment(PunishmentType.BAN, "7d", "Inappropriate Plot Content"),
+                    //new Punishment(PunishmentType.BAN, "7d", "Inappropriate Plot Content"),
                     new Punishment(PunishmentType.BAN, "perm", "Mute Evasion")
             };
 
@@ -181,7 +180,6 @@ public class ModQAScreen extends Screen {
                     DrawButton optionButton = new DrawButton(
                             new Point(0, (blockSize + 1) * j + 1),
                             new Point(optionButtonList.parent().getWidth(), blockSize),
-                            0,
                             new ARGB(mainColor, 0.55f * animation.getProgress()),
                             new ARGB(enabledColor, 0.55f * animation.getProgress()),
                             optionButtonList.parent()
@@ -193,7 +191,7 @@ public class ModQAScreen extends Screen {
                             context.disableScissor();
                             if (containsPoint(mouseX, mouseY)) {
                                 //DrawContextHelper.drawTooltip(context, optionInfo, mouseX, mouseY, 0);
-                                customToolTip[0] = new DrawCustomToolTip(new Point(mouseX, mouseY), optionInfo, 0, 0);
+                                customToolTip[0] = new DrawCustomToolTip(new Point(mouseX, mouseY), optionInfo, 0);
                             }
                         }
                     };
@@ -211,7 +209,6 @@ public class ModQAScreen extends Screen {
                     DrawText optionText = new DrawText(
                             new Point(playerNameMargin, 0),
                             optionName,
-                            0,
                             animation.getProgress(),
                             true,
                             optionButton
@@ -224,11 +221,11 @@ public class ModQAScreen extends Screen {
 
 
         } else {
-            DrawRect mainErrorContainer = new DrawRect(Point.ZERO, new Point(mainContainer.getWidth() - sidebarContainer.getWidth(), mainContainer.getHeight()), 0, new ARGB(ColorBank.BLACK, 0f), sidebarContainer);
+            DrawRect mainErrorContainer = new DrawRect(Point.ZERO, new Point(mainContainer.getWidth() - sidebarContainer.getWidth(), mainContainer.getHeight()), new ARGB(ColorBank.BLACK, 0f), sidebarContainer);
             mainErrorContainer.setParentBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.NONE));
 
 
-            DrawText errorText = new DrawText(Point.ZERO, Component.literal("No tracked players... /track <player>").withColor(ColorBank.MC_RED), 0, animation.getProgress(), true, mainErrorContainer);
+            DrawText errorText = new DrawText(Point.ZERO, Component.literal("No tracked players... /track <player>").withColor(ColorBank.MC_RED), animation.getProgress(), true, mainErrorContainer);
             errorText.setParentBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
             errorText.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
         }

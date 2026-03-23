@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 public abstract class DrawObject {
     protected Point position, size;
-    protected int z;
 
     protected DrawObject parent;
     protected ArrayList<DrawObject> drawables;
@@ -48,7 +47,6 @@ public abstract class DrawObject {
     public Point getSize() { return size; }
     public int getHeight() { return getSize().y(); }
     public int getWidth() { return getSize().x(); }
-    public int getZ() { return this.z; }
 
     public boolean mouseClick(MouseButtonEvent click, boolean doubled) {
         //Mod.message(this.toString() + " " + Mod.tick);

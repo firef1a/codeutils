@@ -9,14 +9,14 @@ import net.minecraft.network.chat.Component;
 
 public class DrawLabeledRect extends DrawRect {
 
-    public DrawLabeledRect(Point position, Point size, Component text, int z, boolean shadow, ARGB color) {
-        this(position, size, text, z, color, shadow, null);
+    public DrawLabeledRect(Point position, Point size, Component text, boolean shadow, ARGB color) {
+        this(position, size, text, color, shadow, null);
     }
 
-    public DrawLabeledRect(Point position, Point size, Component text, int z, ARGB color, boolean shadow, DrawObject parent) {
-        super(position, size, z, color, parent);
+    public DrawLabeledRect(Point position, Point size, Component text, ARGB color, boolean shadow, DrawObject parent) {
+        super(position, size, color, parent);
 
-        DrawText label = new DrawText(new Point(0, 0), text, 0, 1f, shadow, this);
+        DrawText label = new DrawText(new Point(0, 0), text, 1f, shadow, this);
         label.setParentBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
         label.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
         addDrawable(label);

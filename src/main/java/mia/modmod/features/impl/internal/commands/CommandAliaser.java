@@ -35,7 +35,8 @@ public final class CommandAliaser extends Feature implements RegisterCommandList
 
         List<GreedyAlias> greedyAliasList = List.of(
                 new GreedyAlias("plot vars", "pattern", "vars"),
-                new GreedyAlias("support spectate-code", "id", "cs", "codespectate")
+                new GreedyAlias("support spectate-code", "id", "cs", "codespectate"),
+                new GreedyAlias("support stats", "stats", "name")
         );
 
         for (SimpleAlias simpleAlias : simpleAliasList) {

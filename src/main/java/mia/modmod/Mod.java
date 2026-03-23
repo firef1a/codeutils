@@ -124,7 +124,7 @@ public class Mod implements ClientModInitializer {
 			Mod.MC.player.displayClientMessage(Component.empty()
 				.append(Component.literal(MOD_ID + " ").withColor(mia))
 				.append(Component.literal("᛬ ").withColor(0x9c9c9c))
-				.append(message.copy().withColor(main)), false);
+				.append(message.copy()), false);
 		});
 
 	}

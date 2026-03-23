@@ -6,12 +6,12 @@ import mia.modmod.render.util.Point;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class DrawOutlineRect extends DrawRect {
-    public DrawOutlineRect(Point position, Point size, int z, ARGB color) {
-        this(position, size, z, color, null);
+    public DrawOutlineRect(Point position, Point size, ARGB color) {
+        this(position, size, color, null);
     }
 
-    public DrawOutlineRect(Point position, Point size, int z, ARGB color, DrawObject parent) {
-        super(position, size, z, color, parent);
+    public DrawOutlineRect(Point position, Point size, ARGB color, DrawObject parent) {
+        super(position, size, color, parent);
     }
 
     @Override

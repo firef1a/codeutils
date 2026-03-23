@@ -13,14 +13,13 @@ public class DrawButton extends DrawObject {
     private boolean enabled;
     private Runnable callback = () -> {};
 
-    public DrawButton(Point position, Point size, int z, ARGB disabledColor, ARGB enabledColor) {
-        this(position, size, z, disabledColor, enabledColor, null);
+    public DrawButton(Point position, Point size, ARGB disabledColor, ARGB enabledColor) {
+        this(position, size, disabledColor, enabledColor, null);
     }
 
-    public DrawButton(Point position, Point size, int z, ARGB disabledColor, ARGB enabledColor, DrawObject parent) {
+    public DrawButton(Point position, Point size, ARGB disabledColor, ARGB enabledColor, DrawObject parent) {
         this.position = position;
         this.size = size;
-        this.z = z;
         this.disabledColor = disabledColor;
         this.enabledColor = enabledColor;
         if (parent != null) parent.addDrawable(this);

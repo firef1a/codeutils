@@ -8,8 +8,8 @@ import net.minecraft.client.gui.GuiGraphics;
 public class DrawToggleOutlineRect extends DrawOutlineRect {
     private boolean enabled;
 
-    public DrawToggleOutlineRect(Point position, Point size, int z, ARGB color, DrawObject parent) {
-        super(position, size, z, color, parent);
+    public DrawToggleOutlineRect(Point position, Point size, ARGB color, DrawObject parent) {
+        super(position, size, color, parent);
     }
 
     public void setEnabled(boolean enabled) { this.enabled = enabled; }

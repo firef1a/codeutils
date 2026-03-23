@@ -12,11 +12,11 @@ public class DrawCustomToolTip extends DrawObject {
     private final List<Component> lore;
     private final float yAnchor;
 
-    public DrawCustomToolTip(Point position, List<Component> lore, int z, float yAnchor) {
-        this(position, lore, z, yAnchor,null);
+    public DrawCustomToolTip(Point position, List<Component> lore, float yAnchor) {
+        this(position, lore, yAnchor,null);
     }
 
-    public DrawCustomToolTip(Point position, List<Component> lore, int z, float yAnchor, DrawObject parent) {
+    public DrawCustomToolTip(Point position, List<Component> lore, float yAnchor, DrawObject parent) {
         this.position = position;
         this.lore = lore;
         this.yAnchor = yAnchor;

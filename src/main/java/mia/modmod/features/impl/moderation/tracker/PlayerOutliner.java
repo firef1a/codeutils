@@ -72,10 +72,10 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         int margin = 5;
         int eachHeight = Mod.MC.font.lineHeight + margin * 2;
         Component titleText = Component.literal("Tracked Players:");
-        DrawRect container = new DrawRect(new Point(5,5), new Point(Mod.MC.font.width(titleText.getString()) + margin * 2, eachHeight), 0, new ARGB(ColorBank.BLACK, 0.8f));
-        DrawRect containerUnderline = new DrawRect(new Point(0,-1), new Point(container.getWidth(), 1), 0, new ARGB(0xed7aff, 1f),container);
-        containerUnderline.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
-        DrawText containerTitle = new DrawText(new Point(margin,0), titleText, 0, 1f,true, container);
+        DrawRect container = new DrawRect(new Point(5,5), new Point(Mod.MC.font.width(titleText.getString()) + margin * 2, eachHeight), new ARGB(ColorBank.BLACK, 0.6f));
+        //DrawRect containerUnderline = new DrawRect(new Point(0,-1), new Point(container.getWidth(), 1), 0, new ARGB(0xed7aff, 1f),container);
+        //containerUnderline.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
+        DrawText containerTitle = new DrawText(new Point(margin,0), titleText, 1f,true, container);
         containerTitle.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
         containerTitle.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
@@ -106,9 +106,9 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
             }
             playerContainerSize = playerContainerSize.add(titleOffset, 0);
 
-            DrawRect playerContainer = new DrawRect(playerContainerPosition, playerContainerSize, 0, new ARGB(ColorBank.BLACK, 0.6f));
-            DrawRect playerContainerSide = new DrawRect(new Point(0,0), playerContainerSideSize, 0, new ARGB(onlineColor, 1f), playerContainer);
-            DrawText playerTitle = new DrawText(new Point(margin + playerContainerSide.getWidth() + titleOffset,0), playerText, 0, 1f,false, playerContainer);
+            DrawRect playerContainer = new DrawRect(playerContainerPosition, playerContainerSize,  new ARGB(ColorBank.BLACK, 0.6f));
+            DrawRect playerContainerSide = new DrawRect(new Point(0,0), playerContainerSideSize, new ARGB(onlineColor, 1f), playerContainer);
+            DrawText playerTitle = new DrawText(new Point(margin + playerContainerSide.getWidth() + titleOffset,0), playerText, 1f,false, playerContainer);
             playerTitle.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
             playerTitle.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
@@ -179,18 +179,8 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         int boundingWidth = (int) (screenBoundingBox.getXsize() + margin * 2);
         int boundingHeight = (int) (screenBoundingBox.getYsize() + margin * 2);
 
-        int purpleInt = outlinerColor.getRGB();
-        ARGB fadedPurple = new ARGB(purpleInt, 0.8f);
-        boolean isRainbow = false;
-
-        int period = 5;
-        long phase = 500L;
-
-        /*
-        ARGB c2 = isRainbow ? ARGB.getRainbowARGB(100L+phase, period) : purple;
-        ARGB c3 = isRainbow ? ARGB.getRainbowARGB(200L+phase, period) : purple;
-        ARGB c4 = isRainbow ? ARGB.getRainbowARGB(300L+phase, period) : purple;
-         */
+        int color = outlinerColor.getRGB();
+        ARGB fadedColor = new ARGB(color, 0.8f);
 
         int x = boundingX;
         int y = boundingY;
@@ -198,23 +188,19 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         int width = boundingWidth;
         int height = boundingHeight;
 
-        //int z = 100;
-        //context.scissorStack.push(new ScreenRect(new ScreenPos(x,y), width, height));
-        //context.scissorStack.pop();
-
         int labelRectMargin = 2;
         int labelRectHeight = Mod.MC.font.lineHeight + labelRectMargin * 2;
 
 
         Component labelText = Component.literal(playerEntity.getName().getString() + " ").withColor(ColorBank.WHITE).append(getLatencyText(playerName));
 
-        DrawRect labelRect = new DrawRect(new Point(x, y - labelRectHeight), new Point(Mod.MC.font.width(labelText.getString()) + labelRectMargin*2, labelRectHeight), 0, fadedPurple);
-        DrawText labelDrawText = new DrawText(new Point(labelRectMargin, 0), labelText, 0, 1f, true, labelRect);
+        DrawRect labelRect = new DrawRect(new Point(x, y - labelRectHeight), new Point(Mod.MC.font.width(labelText.getString()) + labelRectMargin*2, labelRectHeight), fadedColor);
+        DrawText labelDrawText = new DrawText(new Point(labelRectMargin, 0), labelText, 1f, true, labelRect);
         labelDrawText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
         labelDrawText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
-        DrawContextHelper.drawRectBorder(context, x, y, width, height, new ARGB(purpleInt, 1.0f));
-        DrawRect shaded = new DrawRect(new Point(x, y), new Point(width, height), 0, new ARGB(purpleInt, 0.4f));
+        DrawContextHelper.drawRectBorder(context, x, y, width, height, new ARGB(color, 1.0f));
+        DrawRect shaded = new DrawRect(new Point(x, y), new Point(width, height),  new ARGB(color, 0.4f));
         shaded.render(context, 0, 0);
 
         labelRect.render(context, 0, 0);
@@ -259,16 +245,17 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
                             String username = StringArgumentType.getString(commandContext, "username");
 
                             if (username.equals("clear")) {
+                                Mod.message(Component.literal("Tracker Cleared!").withColor(ColorBank.WHITE).append(Component.literal(" (" + trackedPlayers.size() + " player" + (trackedPlayers.size() == 1 ? "" : "s") + ")").withColor(ColorBank.WHITE_GRAY)));
                                 trackedPlayers.clear();
-                                Mod.message("Tracker List: Cleared!");
                                 return 1;
                             } else {
                                 if (trackedPlayers.contains(username)) {
                                     trackedPlayers.remove(username);
-                                    Mod.message("Tracker List: Removed " + username);
+
+                                    Mod.message(Component.literal("Stopped Tracking: ").withColor(ColorBank.WHITE).append(Component.literal(username).withColor(ColorBank.WHITE_GRAY)));
                                 } else {
-                                    trackedPlayers.addFirst(username);
-                                    Mod.message("Tracker List: Added " + username);
+                                    addTrackedPlayer(username);
+                                    Mod.message(Component.literal("Tracking: ").withColor(ColorBank.WHITE).append(Component.literal(username).withColor(ColorBank.WHITE_GRAY)));
                                 }
                             }
 

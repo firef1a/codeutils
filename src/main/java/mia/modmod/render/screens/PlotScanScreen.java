@@ -49,15 +49,14 @@ public class PlotScanScreen extends Screen {
         int mainContainerWidth = 300;
         int mainContainerHeight = 200;
 
-        DrawRect mainContainer = new DrawRect(screenSize.mul(0.5, 0.5).add((int)(50*(1-animationScale)),0), new Point(mainContainerWidth, mainContainerHeight), 0, new ARGB(ColorBank.BLACK, 0.6f * animationScale));
+        DrawRect mainContainer = new DrawRect(screenSize.mul(0.5, 0.5).add((int)(50*(1-animationScale)),0), new Point(mainContainerWidth, mainContainerHeight), new ARGB(ColorBank.BLACK, 0.6f * animationScale));
         mainContainer.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
 
-        DrawRect titleBar = new DrawRect(new Point(0,0), new Point(mainContainer.getWidth(), 10), 0, new ARGB(ColorBank.BLACK, 0.6f * animationScale), mainContainer);
+        DrawRect titleBar = new DrawRect(new Point(0,0), new Point(mainContainer.getWidth(), 10), new ARGB(ColorBank.BLACK, 0.6f * animationScale), mainContainer);
 
         DrawText title = new DrawText(
                 new Point(5, titleBar.getHeight() / 2),
                 Component.literal("Plot Scan ").withColor(ColorBank.MC_GRAY).withStyle(ChatFormatting.ITALIC).append(Component.literal("ID-" + (plotScanner.plot == null ? "?" : plotScanner.plot.plotId)).withColor(ColorBank.WHITE_GRAY).withStyle(ChatFormatting.ITALIC)),
-                0,
                 animationScale,
                 true,
                 titleBar

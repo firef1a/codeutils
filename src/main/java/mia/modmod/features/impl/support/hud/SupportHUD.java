@@ -86,24 +86,26 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
             sessionQueue.remove(matcher.group(1));
         }
 
-        matcher = Pattern.compile("^\\[SUPPORT] (.{3,16}) entered a session with (.{3,16})\\..*").matcher(text);
+        matcher = Pattern.compile("^» You have entered a session with (.{3,16})\\.").matcher(text);
         if (matcher.find()) {
-            String supportName = matcher.group(1);
-            String supporteeName = matcher.group(2);
-            if (supportName.equals(playerName)) {
-                Mod.message(sessionQueue.toString());
-                currentSupportSession = sessionQueue.getOrDefault(supporteeName, new SessionEntry(supporteeName, "failed to grab reason :/", System.currentTimeMillis()));
-                currentSupportSession.timestamp = System.currentTimeMillis();
-            }
+            String supporteeName = matcher.group(1);
+            currentSupportSession = sessionQueue.getOrDefault(supporteeName, new SessionEntry(supporteeName, "failed to grab reason :/", System.currentTimeMillis()));
+            currentSupportSession.timestamp = System.currentTimeMillis();
 
             sessionQueue.remove(supporteeName);
         }
 
+        matcher = Pattern.compile("^\\[SUPPORT] (.{3,16}) entered a session with (.{3,16})\\.").matcher(text);
+        if (matcher.find()) {
+            String supporteeName = matcher.group(2);
+            sessionQueue.remove(supporteeName);
+        }
+
         matcher = Pattern.compile("^\\[SUPPORT] (.{3,16}) terminated a session with (.{3,16})\\. ▶ .*").matcher(text);
-        if (matcher.find() && matcher.group(1).equals(playerName)) {currentSupportSession = null;}
+        if (matcher.find() && matcher.group(1).equals(playerName)) { currentSupportSession = null; }
 
         matcher = Pattern.compile("^\\[SUPPORT] (.{3,16}) finished a session with (.{3,16})\\. ▶ .*").matcher(text);
-        if (matcher.find() && matcher.group(1).equals(playerName)) {currentSupportSession = null;}
+        if (matcher.find() && matcher.group(1).equals(playerName)) { currentSupportSession = null; }
 
         // questions unfinished
         matcher = Pattern.compile("^» Support Question: \\(Click to answer\\)\\nAsked by (.{3,16}) (.{3,16})\\n(.*)").matcher(text);
@@ -163,8 +165,6 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
         // SESSIONS
         if (!sessionQueue.isEmpty()) {
             ArrayList<Component> textList = new ArrayList<>();
-            //textList.add(Component.literal("qᴜᴇᴜᴇ:"));
-
             int i = 0;
             for (SessionEntry sessionEntry : sessionQueue.values()) {
                 i++;
@@ -229,7 +229,6 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
             supportHUDContainer = new DrawRect(
                     new Point(Mod.getScaledWindowWidth() - (containerWidth + screenEdgeMargin), screenEdgeMargin),
                     new Point(0, 0),
-                    0,
                     new ARGB(0, 0f)
             );
 
@@ -239,7 +238,6 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
                 DrawRect container = new DrawRect(
                         new Point(0, i == 0 ? 0 : 2),
                         new Point(containerWidth, (Mod.MC.font.lineHeight * components.size()) + (lineSpacing * (components.size() - 1)) + (containerMargin * 2)),
-                        0,
                         new ARGB(ColorBank.BLACK, 0.6f),
                         parentContainer
                 );
@@ -251,7 +249,6 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
                     DrawText line = new DrawText(
                             new Point(containerMargin, containerMargin + ((Mod.MC.font.lineHeight + lineSpacing) * j)),
                             component,
-                            0,
                             1f,
                             false,
                             container
