@@ -1,7 +1,6 @@
 ## modmod
 > DiamondFire quality of life mod for support and moderation staff.
 
-### Latest Release
 > [Latest Release](https://github.com/miawara/modmod/releases)
 
 
