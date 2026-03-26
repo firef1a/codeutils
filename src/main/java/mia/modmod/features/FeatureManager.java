@@ -14,7 +14,7 @@ import mia.modmod.features.impl.internal.staff.VanishTracker;
 import mia.modmod.features.impl.internal.superdupertopsecrte.VerboseLogger;
 import mia.modmod.features.impl.moderation.BetterVanishMSG;
 import mia.modmod.features.impl.moderation.ModQA;
-import mia.modmod.features.impl.moderation.reports.ReportScreenFeature;
+import mia.modmod.features.impl.moderation.reports.ReportTracker;
 import mia.modmod.features.impl.moderation.VanishFly;
 import mia.modmod.features.impl.moderation.reports.ReportTeleport;
 import mia.modmod.features.impl.moderation.tracker.HitRange;
@@ -66,7 +66,7 @@ public final class FeatureManager {
         add(new HitRange(Categories.MODERATION));
         add(new PlayerOutliner(Categories.MODERATION));
         add(new ModQA(Categories.MODERATION));
-        add(new ReportScreenFeature(Categories.MODERATION));
+        add(new ReportTracker(Categories.MODERATION));
 
         initInternalFeatures();
 

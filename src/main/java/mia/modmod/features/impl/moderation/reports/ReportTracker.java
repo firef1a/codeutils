@@ -24,16 +24,17 @@ import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 
-public final class ReportScreenFeature extends Feature implements RegisterKeyBindEvent, TickEvent, RenderHUD, ChatEventListener {
+public final class ReportTracker extends Feature implements RegisterKeyBindEvent, TickEvent, RenderHUD, ChatEventListener {
     public MiaKeyBind openQA;
     private ReportScreen reportScreen;
     public ArrayList<DatedReport> reports;
 
 
-    public ReportScreenFeature(Categories category) {
-        super(category, "Report Screen", "report_screen", "Shows recent reports", new Permissions(SupportPermission.NONE, ModeratorPermission.JR_MOD));
+    public ReportTracker(Categories category) {
+        super(category, "Report Tracker", "report_tracker", "Shows recent reports", new Permissions(SupportPermission.NONE, ModeratorPermission.JR_MOD));
         openQA = new MiaKeyBind("Open Report Screen", GLFW.GLFW_KEY_O, KeyBindCategories.GENERAL_CATEGORY);
         reports = new ArrayList<>();
     }
@@ -49,6 +50,9 @@ public final class ReportScreenFeature extends Feature implements RegisterKeyBin
             String node_text = reportMatcher.group(5);
             String node_number = reportMatcher.group(6);
             long timestamp = System.currentTimeMillis();
+
+            Mod.message(Component.literal("REPORT INC: !"));
+            Mod.message("report: " + String.join(" ", List.of(reporter, offender, offense, private_text, node_text, node_number)));
 
             reports.add(new DatedReport(reporter, offender, offense, private_text, node_text, node_number, timestamp));
         }
