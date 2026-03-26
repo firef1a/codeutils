@@ -141,11 +141,11 @@ public class ModQAScreen extends Screen {
                     new Punishment(PunishmentType.BAN, "30d", "Hacked Client"),
                     new Punishment(PunishmentType.BAN, "perm", "Ban Evasion"),
                     new Punishment(PunishmentType.BAN, "perm", "Inappropriate Skin / Username (Appeal when changed)"),
-                    new Punishment(PunishmentType.BAN, "perm", "Alt Account Abuse"),
-                    new Punishment(PunishmentType.BAN, "perm", "Server Exploiting"),
+                    new Punishment(PunishmentType.BAN, "3d", "Macroing / Autoclicking"),
                     new Punishment(PunishmentType.BAN, "3d", "Information Mods"),
+                    new Punishment(PunishmentType.BAN, "perm", "Server Exploiting"),
                     new Punishment(PunishmentType.BAN, "3d", "Game Exploiting"),
-                    //new Punishment(PunishmentType.BAN, "7d", "Inappropriate Plot Content"),
+                    new Punishment(PunishmentType.BAN, "perm", "Alt Account Abuse"),
                     new Punishment(PunishmentType.BAN, "perm", "Mute Evasion")
             };
 

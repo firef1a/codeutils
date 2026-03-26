@@ -1,8 +1,6 @@
 package mia.modmod.features;
 
 import mia.modmod.features.impl.development.*;
-import mia.modmod.features.impl.development.scanner.PlotLoader;
-import mia.modmod.features.impl.development.scanner.PlotScanner;
 import mia.modmod.features.impl.general.AutoTip;
 import mia.modmod.features.impl.general.chat.SimplifiedStaffChatTags;
 import mia.modmod.features.impl.general.title.JoinButton;
@@ -16,8 +14,9 @@ import mia.modmod.features.impl.internal.staff.VanishTracker;
 import mia.modmod.features.impl.internal.superdupertopsecrte.VerboseLogger;
 import mia.modmod.features.impl.moderation.BetterVanishMSG;
 import mia.modmod.features.impl.moderation.ModQA;
+import mia.modmod.features.impl.moderation.reports.ReportScreenFeature;
 import mia.modmod.features.impl.moderation.VanishFly;
-import mia.modmod.features.impl.moderation.reports.clickonreportsinchattoteleporttothem;
+import mia.modmod.features.impl.moderation.reports.ReportTeleport;
 import mia.modmod.features.impl.moderation.tracker.HitRange;
 import mia.modmod.features.impl.moderation.tracker.PlayerOutliner;
 import mia.modmod.features.impl.support.AutoQueue;
@@ -63,10 +62,11 @@ public final class FeatureManager {
 
         add(new BetterVanishMSG(Categories.MODERATION));
         add(new VanishFly(Categories.MODERATION));
-        add(new clickonreportsinchattoteleporttothem(Categories.MODERATION));
+        add(new ReportTeleport(Categories.MODERATION));
         add(new HitRange(Categories.MODERATION));
         add(new PlayerOutliner(Categories.MODERATION));
         add(new ModQA(Categories.MODERATION));
+        add(new ReportScreenFeature(Categories.MODERATION));
 
         initInternalFeatures();
 

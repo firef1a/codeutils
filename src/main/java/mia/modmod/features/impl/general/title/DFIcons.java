@@ -1,15 +1,14 @@
 package mia.modmod.features.impl.general.title;
 
 public enum DFIcons implements QuickJoinIcon {
-    DF("diamondfire"),
+    df("diamondfire"),
     gay("pridefire"),
-    trans("transfire");
-    /*
-    MELON("melon"),
-    MELON_KING("melon_king"),
-    SITE03("site03"),
-    MACE("mace");
-     */
+    trans("transfire"),
+    melon("melon"),
+    melon_king2("melon_king"),
+    site03("site03");
+    //mace("mace");
+
 
 
     private final String path;

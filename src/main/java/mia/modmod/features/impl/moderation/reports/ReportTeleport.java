@@ -3,7 +3,6 @@ package mia.modmod.features.impl.moderation.reports;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import mia.modmod.ColorBank;
-import mia.modmod.Mod;
 import mia.modmod.features.Categories;
 import mia.modmod.features.Feature;
 import mia.modmod.features.impl.internal.commands.CommandScheduler;
@@ -26,11 +25,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class clickonreportsinchattoteleporttothem extends Feature implements ChatEventListener, RegisterCommandListener {
+public final class ReportTeleport extends Feature implements ChatEventListener, RegisterCommandListener {
+    public static final Pattern REPORT_PATTERN = Pattern.compile("^! Incoming Report \\(([A-Za-z0-9_]{3,16})\\)\\n\\|  Offender: ([A-Za-z0-9_]{3,16})\\n\\|  Offense: (.*)\\n\\|  Location: (Private |)(.*) (\\d*) (?:Mode|Spawn|Existing).*$");
     private final BooleanDataField runalts;
 
-    public clickonreportsinchattoteleporttothem(Categories category) {
-        super(category, "clickonreportsinchattoteleporttothem", "clickonreportsinchattoteleporttothem", "title");
+    public ReportTeleport(Categories category) {
+        super(category, "ReportTeleport", "reportteleport", "Click on report msgs to teleport the offender.");
         runalts = new BooleanDataField("Run /alts", ParameterIdentifier.of(this, "runalts"), true, true);
 
     }
@@ -38,7 +38,7 @@ public final class clickonreportsinchattoteleporttothem extends Feature implemen
     @Override
     public ModifiableEventResult<Component> chatEvent(ModifiableEventData<Component> message, CallbackInfo ci) {
         String base = message.base().getString();
-        Matcher matcher = Pattern.compile("^! Incoming Report \\(([A-Za-z0-9_]{3,16})\\)\\n\\|  Offender: ([A-Za-z0-9_]{3,16})\\n\\|  Offense: (.*)\\n\\|  Location: (Private |)(.*) (\\d*) (?:Mode|Spawn|Existing).*$").matcher(base);
+        Matcher matcher = REPORT_PATTERN.matcher(base);
         if (matcher.find()) {
             String reporter = matcher.group(1);
             String offender = matcher.group(2);

@@ -17,3 +17,6 @@
 ## Contact
 > @miawarajj on discord<br>
 > report bugs on discord or github
+
+## Contributions
+> Uses code from https://github.com/DFOnline/CodeClient for the code spectate code viewer

@@ -51,7 +51,7 @@ public class Mod implements ClientModInitializer {
 		FeatureManager.getFeaturesByIdentifier(RegisterKeyBindEvent.class).forEach(RegisterKeyBindEvent::registerKeyBind);
 
 		log("""
-                         modmod initialization complete! :3
+				                   modmod initialization complete! :3
                 
 				                   .___                 .___
 				  _____   ____   __| _/_____   ____   __| _/
@@ -89,7 +89,6 @@ public class Mod implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> FeatureManager.implementFeatureListener(ClientEventListener.class, ClientEventListener::clientInitialize));
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {FeatureManager.implementFeatureListener(ClientEventListener.class, ClientEventListener::clientShutdown); shutdownClient();});
 		ItemTooltipCallback.EVENT.register(((itemStack, tooltipContext, tooltipType, list) -> FeatureManager.implementFeatureListener(RenderTooltip.class, feature -> feature.tooltip(itemStack, tooltipContext, tooltipType, list))));
-
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Identifier.fromNamespaceAndPath(MOD_ID,"before_chat"), (context, tickDelta) -> {
 			HudMatrixRegistry.setRenderHUDTickCounter(tickDelta);
 			FeatureManager.implementFeatureListener(RenderHUD.class, feature -> feature.renderHUD(context, tickDelta));
