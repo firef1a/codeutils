@@ -53,7 +53,9 @@ public final class VanishTracker extends Feature implements ChatEventListener, A
             modVanishEnabledField.setValue(false);
         }
 
-        return message.pass();
+
+
+        return message.pass();//
     }
 
     public boolean isInModVanish() { return modVanishEnabledField.getValue(); }
