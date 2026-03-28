@@ -30,9 +30,6 @@ public final class SimplifiedStaffChatTags extends Feature implements ChatEventL
 
     @Override
     public ModifiableEventResult<Component> chatEvent(ModifiableEventData<Component> message, CallbackInfo ci) {
-
-        Component test = Component.literal("[A] real [B] test");
-        //replaceTextNew(test, Pattern.compile(""))
         Component modified = message.modified();
 
         // regular stuff

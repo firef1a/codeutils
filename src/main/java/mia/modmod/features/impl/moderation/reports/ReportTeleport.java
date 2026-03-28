@@ -20,19 +20,28 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class ReportTeleport extends Feature implements ChatEventListener, RegisterCommandListener {
-    public static final Pattern REPORT_PATTERN = Pattern.compile("^! Incoming Report \\(([A-Za-z0-9_]{3,16})\\)\\n\\|  Offender: ([A-Za-z0-9_]{3,16})\\n\\|  Offense: (.*)\\n\\|  Location: (Private |)(.*) (\\d*) (?:Mode|Spawn|Existing).*$");
+    public static final Pattern REPORT_PATTERN = Pattern.compile("^! Incoming Report \\(([A-Za-z0-9_]{3,16})\\)\\n\\|  Offender: ([A-Za-z0-9_]{3,16})\\n\\|  Offense: (.*)\\n\\|  Location: (Private |)(.*) (\\d*) ((?:Mode|Spawn|Existing).*)$");
     private final BooleanDataField runalts;
 
     public ReportTeleport(Categories category) {
         super(category, "ReportTeleport", "reportteleport", "Click on report msgs to teleport the offender.");
         runalts = new BooleanDataField("Run /alts", ParameterIdentifier.of(this, "runalts"), true, true);
 
+    }
+
+    public static MutableComponent getFollowComponent(String offender, String node_formatted) {
+        return Component.empty()
+                .append(Component.literal("Follow ").withColor(ColorBank.MC_GRAY))
+                .append(Component.literal(offender).withColor(ColorBank.WHITE))
+                .append(Component.literal(" to ").withColor(ColorBank.MC_GRAY))
+                .append(Component.literal(node_formatted).withColor(ColorBank.WHITE)).copy();
     }
 
     @Override
@@ -46,21 +55,17 @@ public final class ReportTeleport extends Feature implements ChatEventListener, 
             String private_text = matcher.group(4);
             String node_text = matcher.group(5);
             String node_number = matcher.group(6);
+            String mode = matcher.group(7);
             //Mod.error("REPORT DETECTED: " + reporter + " " + offender + " " + offender + " " + private_text + " " + node_text + " " + node_number);
 
             boolean is_private = private_text.isEmpty();
 
 
-            String node_formated = private_text + node_text + " " + node_number;
+            String node_formatted = private_text + node_text + " " + node_number;
             String node_id = is_private ? "node" + node_number : "private" + node_number;
             return message.modified(message.modified().copy().withStyle(
                     style -> style.withHoverEvent(new HoverEvent.ShowText(
-                            Component.empty()
-                                    .append(Component.literal("Follow ").withColor(ColorBank.MC_GRAY))
-                                    .append(Component.literal(offender).withColor(ColorBank.WHITE))
-                                    .append(Component.literal(" to ").withColor(ColorBank.MC_GRAY))
-                                    .append(Component.literal(node_formated).withColor(ColorBank.WHITE))
-                            ))
+                    getFollowComponent(offender, node_formatted)))
                             .withClickEvent(new ClickEvent.RunCommand("/internal_report_teleport " + node_id + " " + offender))));
         }
         return message.pass();

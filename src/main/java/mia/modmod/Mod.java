@@ -51,7 +51,7 @@ public class Mod implements ClientModInitializer {
 		FeatureManager.getFeaturesByIdentifier(RegisterKeyBindEvent.class).forEach(RegisterKeyBindEvent::registerKeyBind);
 
 		log("""
-				                   modmod initialization complete! :3
+				modmod initialization complete! :3
                 
 				                   .___                 .___
 				  _____   ____   __| _/_____   ____   __| _/

@@ -49,12 +49,13 @@ public final class ReportTracker extends Feature implements RegisterKeyBindEvent
             String private_text = reportMatcher.group(4);
             String node_text = reportMatcher.group(5);
             String node_number = reportMatcher.group(6);
+            String mode = reportMatcher.group(7);
             long timestamp = System.currentTimeMillis();
 
             Mod.message(Component.literal("REPORT INC: !"));
-            Mod.message("report: " + String.join(" ", List.of(reporter, offender, offense, private_text, node_text, node_number)));
+            Mod.message("report: " + String.join(" ", List.of(reporter, offender, offense, private_text, node_text, node_number, mode)));
 
-            reports.add(new DatedReport(reporter, offender, offense, private_text, node_text, node_number, timestamp));
+            reports.addFirst(new DatedReport(reporter, offender, offense, private_text, node_text, node_number, mode, timestamp));
         }
         return message.pass();
     }

@@ -59,7 +59,7 @@ public abstract class DrawObject {
     public boolean containsPoint(double mouseX, double mouseY) {
         int x = (int) mouseX;
         int y = (int) mouseY;
-        return mouseX >= x1() && mouseX <= x2() && mouseY >= y1() && mouseY <= y2();
+        return mouseX > x1() && mouseX < x2() && mouseY > y1() && mouseY < y2();
     }
 
     protected abstract void draw(GuiGraphics context, int mouseX, int mouseY);

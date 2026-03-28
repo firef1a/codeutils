@@ -20,8 +20,8 @@ public final class AutoTip extends Feature implements ChatEventListener {
 
     @Override
     public ModifiableEventResult<Component> chatEvent(ModifiableEventData<Component> message, CallbackInfo ci) {
-        if (Pattern.compile("⏵⏵⏵ Use /tip to show your appreciation and receive a □ token notch!").matcher(message.base().getString()).find()) {
-            CommandScheduler.addCommand(new ScheduledCommand("tip", 5000L));
+        if (Pattern.compile("^⏵⏵⏵ Use /tip to show your appreciation and receive a □ token notch!").matcher(message.base().getString()).find()) {
+            CommandScheduler.addCommand(new ScheduledCommand("tip", 3000L));
         }
         return message.pass();
     }
