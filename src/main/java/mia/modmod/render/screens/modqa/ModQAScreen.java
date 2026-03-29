@@ -3,10 +3,9 @@ package mia.modmod.render.screens.modqa;
 import mia.modmod.ColorBank;
 import mia.modmod.Mod;
 import mia.modmod.features.FeatureManager;
-import mia.modmod.features.impl.moderation.tracker.PlayerOutliner;
 import mia.modmod.features.impl.moderation.tracker.PlayerTracker;
 import mia.modmod.features.impl.moderation.tracker.punishments.*;
-import mia.modmod.render.screens.Animation;
+import mia.modmod.render.screens.FPSAnimation;
 import mia.modmod.render.screens.AnimationStage;
 import mia.modmod.render.util.*;
 import mia.modmod.render.util.Point;
@@ -18,17 +17,15 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.jspecify.annotations.NonNull;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class ModQAScreen extends Screen {
     private final Screen parent;
-    public final Animation animation;
+    public final FPSAnimation animation;
 
     private String selectedPlayer = null;
     private boolean hasMovedCursor = false;
@@ -39,7 +36,7 @@ public class ModQAScreen extends Screen {
     public ModQAScreen(Screen parent) {
         super(Component.literal("MODQA"));
         this.parent = parent;
-        this.animation = new Animation(AnimationStage.OPENING, 0f, EasingFunctions::easeInOutCircular);
+        this.animation = new FPSAnimation(AnimationStage.OPENING, 0f, EasingFunctions::easeInOutCircular);
         if (!PlayerTracker.getTrackerPlayers().isEmpty()) this.selectedPlayer = PlayerTracker.getTrackerPlayers().getFirst();
     }
 

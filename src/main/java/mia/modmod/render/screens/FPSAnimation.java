@@ -1,15 +1,16 @@
 package mia.modmod.render.screens;
 
+import mia.modmod.Mod;
 import net.minecraft.util.Mth;
 
 import java.util.function.Function;
 
-public class Animation {
+public class FPSAnimation {
     private AnimationStage animationStage;
     private float progress;
     private final Function<Float, Float> easingFunction;
 
-    public Animation(AnimationStage animationStage, float progress, Function<Float, Float> easingFunction) {
+    public FPSAnimation(AnimationStage animationStage, float progress, Function<Float, Float> easingFunction) {
         this.animationStage = animationStage;
         this.progress = progress;
         this.easingFunction = easingFunction;
@@ -30,6 +31,7 @@ public class Animation {
     }
 
     public void updateAnimation(float delta) {
+        delta = (float) (delta * (60.0 / (Mod.MC.getFps() == 0 ? 60 : Mod.MC.getFps())));
         this.progress = Mth.clamp(progress + (delta * animationStage.direction), 0f, 1f);
         if (progress == 1 && animationStage.equals(AnimationStage.OPENING)) animationStage = AnimationStage.OPEN;
         if (progress == 0 && animationStage.equals(AnimationStage.CLOSING)) animationStage = AnimationStage.CLOSED;

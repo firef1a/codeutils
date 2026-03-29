@@ -1,6 +1,5 @@
 package mia.modmod.render.screens.reportscreen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import mia.modmod.ColorBank;
 import mia.modmod.Mod;
 import mia.modmod.core.MathUtils;
@@ -8,7 +7,7 @@ import mia.modmod.features.FeatureManager;
 import mia.modmod.features.impl.moderation.reports.DatedReport;
 import mia.modmod.features.impl.moderation.reports.ReportTeleport;
 import mia.modmod.features.impl.moderation.reports.ReportTracker;
-import mia.modmod.render.screens.Animation;
+import mia.modmod.render.screens.FPSAnimation;
 import mia.modmod.render.screens.AnimationStage;
 import mia.modmod.render.util.*;
 import mia.modmod.render.util.Point;
@@ -23,7 +22,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -31,7 +29,7 @@ import java.util.Locale;
 public class ReportScreen extends Screen {
     private final ReportTracker reportTracker;
     private final Screen parent;
-    public final Animation animation;
+    public final FPSAnimation animation;
 
     private ArrayList<DrawButton> buttons = new ArrayList<>();
 
@@ -55,7 +53,7 @@ public class ReportScreen extends Screen {
     public ReportScreen(Screen parent) {
         super(Component.literal("REPORT_SCREEN"));
         this.parent = parent;
-        this.animation = new Animation(AnimationStage.OPENING, 0f, EasingFunctions::easeInOutCircular);
+        this.animation = new FPSAnimation(AnimationStage.OPENING, 0f, EasingFunctions::easeInOutCircular);
         this.reportTracker = FeatureManager.getFeature(ReportTracker.class);
     }
 
