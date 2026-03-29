@@ -26,10 +26,7 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,6 +62,11 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
 
     public static ArrayList<String> getTrackerPlayers() { return FeatureManager.getFeature(PlayerTracker.class).trackedPlayers; }
 
+    public static Optional<PunishmentTracks> getTrackedPlayerPunishmentTracks(String name) {
+        if (FeatureManager.getFeature(PlayerTracker.class).trackedPlayerPunishmentTracks.containsKey(name)) return Optional.of(FeatureManager.getFeature(PlayerTracker.class).trackedPlayerPunishmentTracks.get(name));
+        return Optional.empty();
+    }
+
     public static void addTrackedPlayer(String name) {
         if (!PlayerTracker.getTrackerPlayers().contains(name)) FeatureManager.getFeature(PlayerTracker.class).internalAddTrackedPlayer(name);
     }
@@ -84,33 +86,39 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
         ));
     }
 
+    public ArrayList<Component> getTrackedHistoryText(String player) {
+        ArrayList<Component> text = new ArrayList<>();
+        text.add(
+                Component.literal("Punishment History for ").append(Component.literal("'" + player + "'").withColor(ColorBank.WHITE_GRAY))
+        );
+        int numPunishments = 0;
+        for (Map.Entry<PunishmentTrack, ArrayList<PunishmentData>> entry : trackedPlayerPunishmentTracks.get(player).getTrackedPunishments().entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                numPunishments += entry.getValue().size();
+                text.add(
+                        Component.literal( entry.getKey().getReasonText() + " ").withColor(ColorBank.WHITE_GRAY)
+                                .append(Component.literal("[" + entry.getValue().size() + "]").withColor(ColorBank.MC_GRAY))
+                );
+            }
+        }
+        if (numPunishments == 0) {
+            if (trackedPlayerPunishmentTracks.get(player).getAllPunishments().isEmpty()) {
+                text.add(Component.literal("No punishments found!").withColor(ColorBank.MC_RED));
+            }
+        }
+
+        int delta = trackedPlayerPunishmentTracks.get(player).getAllPunishments().size() - numPunishments;
+        if (delta > 0) {
+            text.add(Component.literal(delta + " unidentifiable or informal punishments found!").withColor(ColorBank.MC_RED));
+        }
+        return text;
+    }
+
     private void endGetPlayerHistory() {
         historyState = HistoryState.NONE;
 
         if (currentGetPlayerHistory != null) {
-            Mod.message(
-                    Component.literal("Punishment History for ").append(Component.literal("'" + currentGetPlayerHistory + "'").withColor(ColorBank.WHITE_GRAY))
-            );
-            int numPunishments = 0;
-            for (Map.Entry<PunishmentTrack, ArrayList<PunishmentData>> entry : trackedPlayerPunishmentTracks.get(currentGetPlayerHistory).getTrackedPunishments().entrySet()) {
-                if (!entry.getValue().isEmpty()) {
-                    numPunishments += entry.getValue().size();
-                    Mod.message(
-                            Component.literal( entry.getKey().getReasonText() + " ").withColor(ColorBank.WHITE_GRAY)
-                                    .append(Component.literal("[" + entry.getValue().size() + "]").withColor(ColorBank.MC_GRAY))
-                    );
-                }
-            }
-            if (numPunishments == 0) {
-                if (trackedPlayerPunishmentTracks.get(currentGetPlayerHistory).getAllPunishments().isEmpty()) {
-                    Mod.message(Component.literal(" No punishments found!").withColor(ColorBank.MC_RED));
-                }
-            }
-
-            int delta = trackedPlayerPunishmentTracks.get(currentGetPlayerHistory).getAllPunishments().size() - numPunishments;
-            if (delta > 0) {
-                Mod.message(Component.literal(delta + " unidentifiable or informal punishments found!").withColor(ColorBank.MC_RED));
-            }
+            for (Component component : getTrackedHistoryText(currentGetPlayerHistory)) Mod.message(component);
 
         }
 
@@ -140,8 +148,6 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
 
             if (!offender.equals(issuer)) {
                 for (PunishmentTrack track : PunishmentTrack.values()) {
-                    if (track.equals(PunishmentTrack.SPAMMING) && issuer.equals("Console")) continue;
-
                     for (String pattern : track.getPatterns()) {
                         if (Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(reason).find()) {
                             punishmentTrack = track;
@@ -164,11 +170,17 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
                 PunishmentTracks punishmentTracks = trackedPlayerPunishmentTracks.get(currentGetPlayerHistory);
                 PunishmentData punishmentData = new PunishmentData(offender, punishmentType, issuer, reason, activeExpired, punishmentChronoTimestamp);
 
-                punishmentTracks.addUntrackedPunishment(punishmentData);
+                boolean addUntracked = true;
 
                 if (punishmentTrack != null) {
-                    punishmentTracks.addPunishment(punishmentTrack, punishmentData);
+                    if ((punishmentTrack.equals(PunishmentTrack.SPAMMING) && issuer.equals("Console")) || punishmentType.equals("kicked")) {
+                        addUntracked = false;
+                    } else {
+                        punishmentTracks.addPunishment(punishmentTrack, punishmentData);
+                    }
                 }
+
+                if (addUntracked) punishmentTracks.addUntrackedPunishment(punishmentData);
 
 
                 capturedPunishments++;

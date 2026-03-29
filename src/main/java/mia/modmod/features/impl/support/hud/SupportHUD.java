@@ -127,52 +127,21 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
         int maxTextWidth = 300;
         int screenEdgeMargin = 5;
 
-        ArrayList<ArrayList<Component>> supportTextLists = new ArrayList<ArrayList<Component>>();
+        Mod.MC.execute(() -> {
 
-        // CURRENT
-        if (!(currentSupportSession == null)) {
-            ArrayList<Component> textList = new ArrayList<>();
-            //textList.add(Component.literal("cᴜʀʀᴇɴᴛ ꜱᴇꜱꜱɪᴏɴ:"));
+            ArrayList<ArrayList<Component>> supportTextLists = new ArrayList<ArrayList<Component>>();
 
-            String HMSTimestamp = MathUtils.convertTimestampToHMS(System.currentTimeMillis() - currentSupportSession.timestamp);
-            textList.add(
+            // CURRENT
+            if (!(currentSupportSession == null)) {
+                ArrayList<Component> textList = new ArrayList<>();
+                //textList.add(Component.literal("cᴜʀʀᴇɴᴛ ꜱᴇꜱꜱɪᴏɴ:"));
 
-                    Component.literal("cᴜʀʀᴇɴᴛ ꜱᴇꜱꜱɪᴏɴ:").withColor(ColorBank.WHITE_GRAY)
-                            .append(
-                                    Component.literal(" " + currentSupportSession.name).withColor(0xa6aaff)
-                                            .append(
-                                                    Component.literal(" (" + HMSTimestamp + ")").withColor(ColorBank.WHITE_GRAY)
-                                            )
-                            )
-            );
-
-            textList.add(
-                    Component.literal(" ▶ ").withColor(0xc2c5ff)
-                            .append(
-                                    Component.literal(currentSupportSession.reason).withColor(ColorBank.WHITE)
-                            )
-            );
-
-
-            int maxComponentWidth = 0;
-            for (Component component : textList) {
-                int w = Mod.MC.font.width(component.getString());
-                if (w > maxComponentWidth) maxComponentWidth = w;
-            }
-
-            supportTextLists.add(textList);
-        }
-        // SESSIONS
-        if (!sessionQueue.isEmpty()) {
-            ArrayList<Component> textList = new ArrayList<>();
-            int i = 0;
-            for (SessionEntry sessionEntry : sessionQueue.values()) {
-                i++;
-                String HMSTimestamp = MathUtils.convertTimestampToHMS(System.currentTimeMillis() - sessionEntry.timestamp);
+                String HMSTimestamp = MathUtils.convertTimestampToHMS(System.currentTimeMillis() - currentSupportSession.timestamp);
                 textList.add(
-                        Component.literal("#" + i).withColor(ColorBank.MC_GRAY)
+
+                        Component.literal("cᴜʀʀᴇɴᴛ ꜱᴇꜱꜱɪᴏɴ:").withColor(ColorBank.WHITE_GRAY)
                                 .append(
-                                        Component.literal(" " + sessionEntry.name).withColor(0xa6aaff)
+                                        Component.literal(" " + currentSupportSession.name).withColor(0xa6aaff)
                                                 .append(
                                                         Component.literal(" (" + HMSTimestamp + ")").withColor(ColorBank.WHITE_GRAY)
                                                 )
@@ -182,84 +151,118 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
                 textList.add(
                         Component.literal(" ▶ ").withColor(0xc2c5ff)
                                 .append(
-                                        Component.literal(sessionEntry.reason).withColor(ColorBank.WHITE)
+                                        Component.literal(currentSupportSession.reason).withColor(ColorBank.WHITE)
                                 )
                 );
-            }
-            supportTextLists.add(textList);
-        }
 
-        // QUESTIONS
-        if (!questionQueue.isEmpty()) {
-            ArrayList<Component> textList = new ArrayList<>();
-            //textList.add(Component.literal("qᴜᴇꜱᴛɪᴏɴꜱ:"));
 
-            int i = 0;
-            for (SupportQuestionEntry questionEntry : questionQueue.values()) {
-                i++;
-                String HMSTimestamp = MathUtils.convertTimestampToHMS(System.currentTimeMillis() - questionEntry.timestamp());
-                textList.add(
-                        Component.literal(questionEntry.name()).withColor(0x97ff94)
-                                .append(
-                                        Component.literal(" " + questionEntry.rank() + " ").withColor(ColorBank.MC_GRAY)
-                                                .append(
-                                                        Component.literal("(" + HMSTimestamp +")").withColor(ColorBank.WHITE_GRAY)
-                                                )
-                                )
-                );
-                textList.add(
-                        Component.literal(" - ").withColor(ColorBank.MC_GRAY)
-                                .append(
-                                        Component.literal(questionEntry.message()).withColor(ColorBank.WHITE)
-                                )
-                );
-            }
-            supportTextLists.add(textList);
-        }
-
-        if (!supportTextLists.isEmpty()) {
-            int maxWidth = 0;
-            for (ArrayList<Component> components : supportTextLists) {
-                for (Component component : components) {
+                int maxComponentWidth = 0;
+                for (Component component : textList) {
                     int w = Mod.MC.font.width(component.getString());
-                    if (w > maxWidth) maxWidth = w;
+                    if (w > maxComponentWidth) maxComponentWidth = w;
                 }
+
+                supportTextLists.add(textList);
             }
-            int containerWidth = maxWidth + (containerMargin * 2);
-            supportHUDContainer = new DrawRect(
-                    new Point(Mod.getScaledWindowWidth() - (containerWidth + screenEdgeMargin), screenEdgeMargin),
-                    new Point(0, 0),
-                    new ARGB(0, 0f)
-            );
-
-            DrawRect parentContainer = supportHUDContainer;
-            int i = 0;
-            for (ArrayList<Component> components : supportTextLists) {
-                DrawRect container = new DrawRect(
-                        new Point(0, i == 0 ? 0 : 2),
-                        new Point(containerWidth, (Mod.MC.font.lineHeight * components.size()) + (lineSpacing * (components.size() - 1)) + (containerMargin * 2)),
-                        new ARGB(ColorBank.BLACK, 0.6f),
-                        parentContainer
-                );
-                container.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
-                parentContainer = container;
-
-                int j = 0;
-                for (Component component : components) {
-                    DrawText line = new DrawText(
-                            new Point(containerMargin, containerMargin + ((Mod.MC.font.lineHeight + lineSpacing) * j)),
-                            component,
-                            1f,
-                            false,
-                            container
+            // SESSIONS
+            if (!sessionQueue.isEmpty()) {
+                ArrayList<Component> textList = new ArrayList<>();
+                int i = 0;
+                for (SessionEntry sessionEntry : sessionQueue.values()) {
+                    i++;
+                    String HMSTimestamp = MathUtils.convertTimestampToHMS(System.currentTimeMillis() - sessionEntry.timestamp);
+                    textList.add(
+                            Component.literal("#" + i).withColor(ColorBank.MC_GRAY)
+                                    .append(
+                                            Component.literal(" " + sessionEntry.name).withColor(0xa6aaff)
+                                                    .append(
+                                                            Component.literal(" (" + HMSTimestamp + ")").withColor(ColorBank.WHITE_GRAY)
+                                                    )
+                                    )
                     );
-                    j++;
+
+                    textList.add(
+                            Component.literal(" ▶ ").withColor(0xc2c5ff)
+                                    .append(
+                                            Component.literal(sessionEntry.reason).withColor(ColorBank.WHITE)
+                                    )
+                    );
                 }
-                i++;
+                supportTextLists.add(textList);
             }
 
-            supportHUDContainer.render(context, 0, 0);
-        }
+            // QUESTIONS
+            if (!questionQueue.isEmpty()) {
+                ArrayList<Component> textList = new ArrayList<>();
+                //textList.add(Component.literal("qᴜᴇꜱᴛɪᴏɴꜱ:"));
+
+                int i = 0;
+                for (SupportQuestionEntry questionEntry : questionQueue.values()) {
+                    i++;
+                    String HMSTimestamp = MathUtils.convertTimestampToHMS(System.currentTimeMillis() - questionEntry.timestamp());
+                    textList.add(
+                            Component.literal(questionEntry.name()).withColor(0x97ff94)
+                                    .append(
+                                            Component.literal(" " + questionEntry.rank() + " ").withColor(ColorBank.MC_GRAY)
+                                                    .append(
+                                                            Component.literal("(" + HMSTimestamp + ")").withColor(ColorBank.WHITE_GRAY)
+                                                    )
+                                    )
+                    );
+                    textList.add(
+                            Component.literal(" - ").withColor(ColorBank.MC_GRAY)
+                                    .append(
+                                            Component.literal(questionEntry.message()).withColor(ColorBank.WHITE)
+                                    )
+                    );
+                }
+                supportTextLists.add(textList);
+            }
+
+            if (!supportTextLists.isEmpty()) {
+                int maxWidth = 0;
+                for (ArrayList<Component> components : supportTextLists) {
+                    for (Component component : components) {
+                        int w = Mod.MC.font.width(component.getString());
+                        if (w > maxWidth) maxWidth = w;
+                    }
+                }
+                int containerWidth = maxWidth + (containerMargin * 2);
+                supportHUDContainer = new DrawRect(
+                        new Point(Mod.getScaledWindowWidth() - (containerWidth + screenEdgeMargin), screenEdgeMargin),
+                        new Point(0, 0),
+                        new ARGB(0, 0f)
+                );
+
+                DrawRect parentContainer = supportHUDContainer;
+                int i = 0;
+                for (ArrayList<Component> components : supportTextLists) {
+                    DrawRect container = new DrawRect(
+                            new Point(0, i == 0 ? 0 : 2),
+                            new Point(containerWidth, (Mod.MC.font.lineHeight * components.size()) + (lineSpacing * (components.size() - 1)) + (containerMargin * 2)),
+                            new ARGB(ColorBank.BLACK, 0.6f),
+                            parentContainer
+                    );
+                    container.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
+                    parentContainer = container;
+
+                    int j = 0;
+                    for (Component component : components) {
+                        DrawText line = new DrawText(
+                                new Point(containerMargin, containerMargin + ((Mod.MC.font.lineHeight + lineSpacing) * j)),
+                                component,
+                                1f,
+                                false,
+                                container
+                        );
+                        j++;
+                    }
+                    i++;
+                }
+
+                supportHUDContainer.render(context, 0, 0);
+            }
+        });
     }
 
     @Override

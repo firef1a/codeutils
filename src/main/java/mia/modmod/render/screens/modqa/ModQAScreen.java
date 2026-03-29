@@ -5,6 +5,7 @@ import mia.modmod.Mod;
 import mia.modmod.features.FeatureManager;
 import mia.modmod.features.impl.moderation.tracker.PlayerOutliner;
 import mia.modmod.features.impl.moderation.tracker.PlayerTracker;
+import mia.modmod.features.impl.moderation.tracker.punishments.*;
 import mia.modmod.render.screens.Animation;
 import mia.modmod.render.screens.AnimationStage;
 import mia.modmod.render.util.*;
@@ -17,9 +18,13 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.jspecify.annotations.NonNull;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ModQAScreen extends Screen {
     private final Screen parent;
@@ -61,7 +66,7 @@ public class ModQAScreen extends Screen {
         mainContainer.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
 
         DrawRect sidebarContainer = new DrawRect(Point.ZERO, new Point(100, mainContainerHeight), new ARGB(mainColor, 0.4f * animation.getProgress()), mainContainer);
-        final DrawCustomToolTip[] customToolTip = new DrawCustomToolTip[1];
+        DrawCustomToolTip customToolTip = null;
 
 
         int playerNameMargin = 4;
@@ -88,6 +93,16 @@ public class ModQAScreen extends Screen {
                     setSelectedPlayer(playerName);
                 });
                 buttons.add(playerContainer);
+
+                DrawRect playerContainerBottom = new DrawRect(
+                        new Point(0,0),
+                        new Point(playerContainer.getWidth(), 1),
+                        new ARGB(ColorBank.WHITE_GRAY, 0.2f * animation.getProgress()),
+                        playerContainer
+                );
+                playerContainerBottom.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
+                playerContainerBottom.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
+
                 DrawText playerNameText = new DrawText(new Point(playerNameMargin, 0), Component.literal(playerName), animation.getProgress(), true, playerContainer);
                 playerNameText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
                 playerNameText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
@@ -135,45 +150,99 @@ public class ModQAScreen extends Screen {
             muteContainerTitleText.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
 
+            // punishment stuff :33
 
-            Punishment[] banOptions = {
-                    new Punishment(PunishmentType.BAN, "30d", "Hacked Client"),
-                    new Punishment(PunishmentType.BAN, "perm", "Ban Evasion"),
-                    new Punishment(PunishmentType.BAN, "perm", "Inappropriate Skin / Username (Appeal when changed)"),
-                    new Punishment(PunishmentType.BAN, "3d", "Macroing / Autoclicking"),
-                    new Punishment(PunishmentType.BAN, "3d", "Information Mods"),
-                    new Punishment(PunishmentType.BAN, "perm", "Server Exploiting"),
-                    new Punishment(PunishmentType.BAN, "3d", "Game Exploiting"),
-                    new Punishment(PunishmentType.BAN, "perm", "Alt Account Abuse"),
-                    new Punishment(PunishmentType.BAN, "perm", "Mute Evasion")
+
+            record OptionButtonList(PunishmentTrack[] optionList, DrawObject parent) {}
+
+            PunishmentTrack[] banOptions = {
+                    PunishmentTrack.HACKED_CLIENT,
+                    PunishmentTrack.BAN_EVASION,
+                    PunishmentTrack.INAPPROPRIATE_SKIN_USERNAME,
+                    PunishmentTrack.MACROING,
+                    PunishmentTrack.CLIENT_EXPLOITING,
+                    PunishmentTrack.INFORMATION_MODS,
+                    PunishmentTrack.MALICIOUS_ITEMS,
+                    PunishmentTrack.SERVER_CRASHING,
             };
 
-            Punishment[] muteOptions = {
-                    new Punishment(PunishmentType.WARN, "", "Filter Bypass"),
-                    new Punishment(PunishmentType.WARN, "", "Spam"),
-                    new Punishment(PunishmentType.WARN, "", "Toxicity"),
-                    new Punishment(PunishmentType.WARN, "", "Plot Ad Misuse"),
-                    new Punishment(PunishmentType.MUTE, "7d", "Suicide Encouragement"),
-                    new Punishment(PunishmentType.MUTE, "7d", "Harassment"),
-                    new Punishment(PunishmentType.MUTE, "1d", "Banned Topics"),
-                    new Punishment(PunishmentType.MUTE, "3d", "Inappropriate Chat"),
-                    new Punishment(PunishmentType.MUTE, "14d", "Extremely Inappropriate Chat"),
-                    new Punishment(PunishmentType.MUTE, "14d", "Discrimination"),
+            PunishmentTrack[] muteOptions = {
+                    PunishmentTrack.FILTER_BYPASS,
+                    PunishmentTrack.SPAMMING,
+                    PunishmentTrack.PLOT_AD,
+                    PunishmentTrack.DISCRIMINATION,
+                    PunishmentTrack.TOXICITY_GENERAL_RUDENESS,
+                    PunishmentTrack.TOXICITY_HARASSMENT,
+                    PunishmentTrack.TOXICITY_SUICIDE,
+                    PunishmentTrack.BANNED_TOPICS,
+                    PunishmentTrack.INAPPROPRIATE_CHAT,
+                    PunishmentTrack.SEVERELY_INAPPROPRIATE_CHAT,
             };
 
-            record OptionButtonList(Punishment[] optionList, DrawObject parent) {}
+            PunishmentTracks punishmentHistory = new PunishmentTracks();
+            if (PlayerTracker.getTrackedPlayerPunishmentTracks(selectedPlayer).isPresent()) punishmentHistory = PlayerTracker.getTrackedPlayerPunishmentTracks(selectedPlayer).get();
+
+            ArrayList<Component> historyComponents = FeatureManager.getFeature(PlayerTracker.class).getTrackedHistoryText(selectedPlayer);
+
+
+            //int longestHistoryComponentWidth = 0;
+            //for (Component component : historyComponents) if (Mod.MC.font.width(component.getString()) > longestHistoryComponentWidth) longestHistoryComponentWidth = Mod.MC.font.width(component.getString());
+
+            DrawRect historyContainer = new DrawRect(
+                    new Point(0, -playerNameMargin),
+                    new Point(mainContainer.getWidth(), ((font.lineHeight+1) * historyComponents.size()) + (playerNameMargin * 2)),
+                    new ARGB(mainColor, 0.4f * animation.getProgress()),
+                    mainContainer
+            );
+            historyContainer.setSelfBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
+
+            int k = 0;
+            for (Component component : historyComponents) {
+                DrawText historyLine = new DrawText(
+                        new Point(playerNameMargin, playerNameMargin + ((font.lineHeight+1) * k)),
+                        component,
+                        animation.getProgress(),
+                        true,
+                        historyContainer
+                );
+                k++;
+            }
+
+
 
             for (OptionButtonList optionButtonList : new OptionButtonList[]{ new OptionButtonList(banOptions, banContainerTitle) , new OptionButtonList(muteOptions, muteContainerTitle) }) {
                 int j = 0;
-                for (Punishment option : optionButtonList.optionList()) {
+                for (PunishmentTrack punishmentTrack : optionButtonList.optionList()) {
+                    PunishmentEscalation punishmentEscalation = punishmentTrack.getPunishmentEscalation();
+
+                    int chances = punishmentEscalation.chances();
+                    PunishmentDuration severity = punishmentEscalation.severity();
+                    PunishmentDuration maxDuration = punishmentEscalation.maxDuration();
+                    ServerPunishmentType punishmentType = punishmentEscalation.punishmentType();
+
+                    ArrayList<PunishmentData> trackHistory = punishmentHistory.getTrackedPunishments().get(punishmentTrack);
+
+
+                    int numOffenses = trackHistory.size();
+
+                    int punishLevel = Math.max(((numOffenses - chances) + 1), 0);
+                    PunishmentDuration punishmentDuration;
+
+                    if (punishLevel == 0) {
+                        punishmentType = ServerPunishmentType.WARN;
+                        punishmentDuration = PunishmentDuration.WARNING;
+                    } else {
+                        punishmentDuration = PunishmentDuration.values()[Math.min((severity.ordinal() + punishLevel) - 1, maxDuration.ordinal())];
+                    }
+
                     ArrayList<Component> optionInfo = new ArrayList<>();
 
-                    Component optionName = option.type.prefixText.copy().append(Component.literal(" " + option.reason).withColor(ColorBank.WHITE_GRAY));
-                    optionInfo.add(Component.literal(option.reason));
-                    if (!option.duration.isEmpty()) {
-                        optionInfo.add(Component.literal("Duration: " + option.duration).withColor(ColorBank.MC_GRAY));
+                    Component optionName = punishmentType.getPrefixText().copy().append(Component.literal(" " + punishmentTrack.getReasonText()).withColor(ColorBank.WHITE_GRAY));
+                    optionInfo.add(Component.literal(punishmentTrack.getReasonText()));
+                    if (!punishmentDuration.getDurationString().isEmpty()) {
+                        optionInfo.add(Component.literal("Duration: " + punishmentDuration.getDurationString()).withColor(ColorBank.MC_GRAY));
                     }
-                    String command = option.getCommand(selectedPlayer, Mod.MC.hasShiftDown());
+                    String command = PunishmentEscalation.buildCommand(selectedPlayer, punishmentType, punishmentDuration.getDurationString(), punishmentTrack.getReasonText(), Mod.MC.hasShiftDown());
                     optionInfo.add(Component.literal(command).withColor(ColorBank.WHITE_GRAY));
 
                     DrawButton optionButton = new DrawButton(
@@ -188,12 +257,106 @@ public class ModQAScreen extends Screen {
                             context.enableScissor(this.x1(), this.y1(), this.x2(), this.y2());
                             super.render(context, mouseX, mouseY);
                             context.disableScissor();
-                            if (containsPoint(mouseX, mouseY)) {
-                                //DrawContextHelper.drawTooltip(context, optionInfo, mouseX, mouseY, 0);
-                                customToolTip[0] = new DrawCustomToolTip(new Point(mouseX, mouseY), optionInfo, 0);
-                            }
                         }
                     };
+
+                    buttons.add(optionButton);
+                    optionButton.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
+
+                    if (optionButton.containsPoint(mouseX, mouseY)) {
+                        customToolTip = new DrawCustomToolTip(new Point(mouseX, mouseY), optionInfo, 0);
+
+                        ArrayList<PunishmentDuration> tierList = new ArrayList<>(List.of());
+                        if (chances > 0) tierList.add(PunishmentDuration.WARNING);
+                        tierList.addAll(Arrays.asList(PunishmentDuration.values()).subList(severity.ordinal(), maxDuration.ordinal()+1));
+
+                        int tierWidth = ((int) ((double) mainContainer.getWidth() / tierList.size())) - 1;
+                        int tierHeight = 25;
+
+
+                        DrawRect trackContainer = new DrawRect(
+                                new Point(0, playerNameMargin),
+                                new Point((tierWidth * tierList.size()) + (tierList.size()-1), tierHeight + ((font.lineHeight+1) * 2) + (playerNameMargin * 3)),
+                                new ARGB(mainColor, 0.4f * animation.getProgress()),
+                                mainContainer
+                        );
+                        trackContainer.setParentBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.FULL));
+                        trackContainer.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.NONE));
+
+
+                        DrawText trackContainerTitle = new DrawText(
+                                new Point(playerNameMargin, playerNameMargin),
+                                Component.literal("Punishment Severity:").withColor(ColorBank.WHITE_GRAY),
+                                animation.getProgress(),
+                                true,
+                                trackContainer
+                        );
+
+
+                        int m = 0;
+                        for (PunishmentDuration tier : tierList) {
+                            Component tierText = Component.literal(tier.getDurationString());
+                            boolean isWarning = tier.equals(PunishmentDuration.WARNING);
+                            boolean isPerm = tier.equals(PunishmentDuration.PERM);
+
+                            if (isWarning) tierText = Component.literal("Chances: " + Math.max(chances - numOffenses , 0));
+                            if (isPerm)    tierText = Component.literal("Permanent");
+
+                            int tierRectColor = ARGB.lerpColor(0xffb09e, 0xff461c, ((float) (m+1) / tierList.size()));
+                            if (isWarning) tierRectColor = 0xffc94d;
+                            if (isPerm) tierRectColor = 0xdb4321;
+                            DrawRect eachTierRect = new DrawRect(
+                                    new Point(((tierWidth + 1) * m), font.lineHeight + (playerNameMargin * 2)),
+                                    new Point( tierWidth, tierHeight),
+                                    new ARGB(tierRectColor, 0.75f * animation.getProgress()),
+                                    trackContainer
+                            );
+
+                            DrawText tierDrawText = new DrawText(
+                                    new Point(0, isWarning ? -Mod.MC.font.lineHeight/2 : 0),
+                                    isWarning ? Component.literal("Warning") :tierText,
+                                    animation.getProgress(),
+                                    true,
+                                    eachTierRect
+                            );
+                            tierDrawText.setParentBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
+                            tierDrawText.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
+
+                            if (isWarning) {
+                                DrawText chanceText = new DrawText(
+                                        new Point(0, 1),
+                                        tierText,
+                                        animation.getProgress(),
+                                        true,
+                                        tierDrawText
+                                );
+                                chanceText.setParentBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.FULL));
+                                chanceText.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.NONE));
+                            }
+
+                            if (tier.equals(punishmentDuration)) {
+                                DrawOutlineRect outlineRect = new DrawOutlineRect(
+                                        Point.ZERO,
+                                        eachTierRect.getSize(),
+                                        new ARGB(ColorBank.WHITE, 0.7f * animation.getProgress()),
+                                        eachTierRect
+
+                                );
+                                DrawText indicator = new DrawText(
+                                        new Point(0,playerNameMargin),
+                                        Component.literal("[Current]").withColor(ColorBank.MC_RED),
+                                        animation.getProgress(),
+                                        true,
+                                        eachTierRect
+                                );
+                                indicator.setParentBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.FULL));
+                                indicator.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.NONE));
+                            }
+                            m++;
+                        }
+                    }
+
+
                     optionButton.setCallback(() -> {
                         Mod.sendCommand(command);
                         PlayerTracker.getTrackerPlayers().remove(selectedPlayer);
@@ -203,8 +366,6 @@ public class ModQAScreen extends Screen {
                             setSelectedPlayer(null);
                         }
                     });
-                    buttons.add(optionButton);
-                    optionButton.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
                     DrawText optionText = new DrawText(
                             new Point(playerNameMargin, 0),
                             optionName,
@@ -230,27 +391,8 @@ public class ModQAScreen extends Screen {
         }
 
         mainContainer.render(context, mouseX, mouseY);
-        if (customToolTip[0] != null) customToolTip[0].render(context, mouseX, mouseY);
+        if (customToolTip != null) customToolTip.render(context, mouseX, mouseY);
         updateAnimation();
-    }
-    private enum PunishmentType {
-        WARN("warn", Component.literal("[W]").withColor(0xffd942)),
-        MUTE("mute", Component.literal("[M]").withColor(ColorBank.MC_GREEN)),
-        BAN("ban", Component.literal("[B]").withColor(ColorBank.MC_RED));
-
-        private final String prefix;
-        private final Component prefixText;
-
-        PunishmentType(String prefix, Component prefixText) {
-            this.prefix = prefix;
-            this.prefixText = prefixText;
-        }
-    }
-
-    private record Punishment(PunishmentType type, String duration, String reason) {
-        public String getCommand(String playerName, boolean silent) {
-            return "/" + type.prefix + " " + playerName + (duration.equals("perm") ? "" : (duration.isEmpty() ? "" : " " + duration)) + (silent ? " -s" : "")  + " " + reason;
-        }
     }
 
     private void updateAnimation() {

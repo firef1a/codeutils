@@ -50,7 +50,8 @@ public class Mod implements ClientModInitializer {
 		Mod.registerCallbacks();
 		FeatureManager.getFeaturesByIdentifier(RegisterKeyBindEvent.class).forEach(RegisterKeyBindEvent::registerKeyBind);
 
-		log("""
+		log(
+				"""
 				modmod initialization complete! :3
                 
 				                   .___                 .___

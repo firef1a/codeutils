@@ -1,5 +1,5 @@
 ## modmod
-> DiamondFire quality of life mod for support and moderation staff. This is specifically tailored for DF staff, so you won't get much utility out of it if you aren't a DF staff member.<br>
+> DiamondFire quality of life mod for support and moderation staff. This is designed for DF staff, so you won't get much utility out of it if you aren't a staff member.<br>
 > [How to use this mod](https://github.com/miawara/modmod/wiki)
 
 ### Latest Release

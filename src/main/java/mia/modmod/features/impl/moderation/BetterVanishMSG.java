@@ -32,7 +32,7 @@ public final class BetterVanishMSG extends Feature implements ChatEventListener 
         if (matcher.find()) {
             return message.modified(Component.empty()
                     .append(betterSCTags ? SimplifiedStaffChatTags.MOD : Component.literal("[MOD]").withColor(ColorBank.MC_DARK_GREEN))
-                    .append(Component.translatable("codeutils.vanishmsgs.enabled").withColor(ColorBank.MC_GRAY))
+                    .append(Component.translatable("modmod.vanishmsgs.enabled").withColor(ColorBank.MC_GRAY))
                     .append(Component.literal(" ✔").withColor(ColorBank.MC_GREEN)));
         }
 
@@ -40,7 +40,7 @@ public final class BetterVanishMSG extends Feature implements ChatEventListener 
         if (matcher.find()) {
             return message.modified(Component.empty()
                     .append(betterSCTags ? SimplifiedStaffChatTags.MOD : Component.literal("[MOD]").withColor(ColorBank.MC_DARK_GREEN))
-                    .append(Component.translatable("codeutils.vanishmsgs.disabled").withColor(ColorBank.MC_GRAY))
+                    .append(Component.translatable("modmod.vanishmsgs.disabled").withColor(ColorBank.MC_GRAY))
                     .append(Component.literal(" ❌").withColor(ColorBank.MC_RED)));
         }
 

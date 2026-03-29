@@ -14,7 +14,7 @@ public final class MathUtils {
     }
 
     public static String convertTimestampToHMS(long timestamp) {
-        Date date = new Date(timestamp);
+        Date date = new Date((timestamp / 1000L) * 1000L);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(date);
@@ -31,11 +31,7 @@ public final class MathUtils {
                 ts = ts.substring(1);
                 continue;
             }
-            if (ts.startsWith("h")) {
-                ts = ts.substring(1);
-                continue;
-            }
-            if (ts.startsWith("m")) {
+            if (ts.startsWith("h") || ts.startsWith("m") || ts.startsWith("d")) {
                 ts = ts.substring(1);
                 continue;
             }

@@ -31,9 +31,9 @@ public final class VanishTracker extends Feature implements ChatEventListener, A
 
     public VanishTracker(Categories category) {
         super(category, "Vanish Tracker", "vstatetracker", "Tracks vanish state");
-        modVanishEnabledField = new InternalBooleanDataField(Component.translatable("codeutils.vanish_tracker.mod_vanish").getString(), ParameterIdentifier.of(this, "mod_vanish"), false, true);
-        adminVanishEnabledField = new InternalBooleanDataField(Component.translatable("codeutils.vanish_tracker.admin_vanish").getString(), ParameterIdentifier.of(this, "admin_vanish"), false, true);
-        ytVanishEnabledField = new InternalBooleanDataField(Component.translatable("codeutils.vanish_tracker.yt_vanish").getString(), ParameterIdentifier.of(this, "yt_vanish"), false, true);
+        modVanishEnabledField = new InternalBooleanDataField(Component.translatable("modmod.vanish_tracker.mod_vanish").getString(), ParameterIdentifier.of(this, "mod_vanish"), false, true);
+        adminVanishEnabledField = new InternalBooleanDataField(Component.translatable("modmod.vanish_tracker.admin_vanish").getString(), ParameterIdentifier.of(this, "admin_vanish"), false, true);
+        ytVanishEnabledField = new InternalBooleanDataField(Component.translatable("modmod.vanish_tracker.yt_vanish").getString(), ParameterIdentifier.of(this, "yt_vanish"), false, true);
     }
 
     @Override

@@ -1,10 +1,11 @@
 {
-  "codeutils.config.open_config": "Opening config screen...",
-  "codeutils.vanishmsgs.enabled": " Mod Vanish Enabled",
-  "codeutils.vanishmsgs.disabled": " Mod Vanish Disabled",
-  "codeutils.vanish_tracker.mod_vanish": "Mod Vanish",
-  "codeutils.vanish_tracker.admin_vanish": "Admin Vanish",
-  "codeutils.vanish_tracker.yt_vanish": "YT Vanish"
+  "modmod.config.open_config": "Opening config screen...",
+  "modmod.config.how": "ok how did you run this command with another screen open",
+  "modmod.vanishmsgs.enabled": " Mod Vanish Enabled",
+  "modmod.vanishmsgs.disabled": " Mod Vanish Disabled",
+  "modmod.vanish_tracker.mod_vanish": "Mod Vanish",
+  "modmod.vanish_tracker.admin_vanish": "Admin Vanish",
+  "modmod.vanish_tracker.yt_vanish": "YT Vanish"
 
 
 }

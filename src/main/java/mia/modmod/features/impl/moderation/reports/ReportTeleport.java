@@ -3,6 +3,7 @@ package mia.modmod.features.impl.moderation.reports;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import mia.modmod.ColorBank;
+import mia.modmod.Mod;
 import mia.modmod.features.Categories;
 import mia.modmod.features.Feature;
 import mia.modmod.features.FeatureManager;
@@ -65,21 +66,24 @@ public final class ReportTeleport extends Feature implements ChatEventListener, 
 
             String node_formatted = private_text + node_text + " " + node_number;
             String node_id = is_private ? "node" + node_number : "private" + node_number;
+
+            int hashCode = (reporter + offender + offender + private_text + node_text + node_number + mode).hashCode();
+
             return message.modified(message.modified().copy().withStyle(
                     style -> style.withHoverEvent(new HoverEvent.ShowText(
                     getFollowComponent(offender, node_formatted)))
-                            .withClickEvent(new ClickEvent.RunCommand("/internal_report_teleport " + node_id + " " + offender))));
+                            .withClickEvent(new ClickEvent.RunCommand("/internal_report_teleport " + node_id + " " + offender + " " + hashCode))));
         }
         return message.pass();
     }
 
 
-    public static void internalReportTeleport(String player_name, String node_id) {
-        CommandScheduler.addCommand(new ScheduledCommand("preference mod_vanish true"));
+    public static void internalReportTeleport(String player_name, String node_id) {;
+        PlayerTracker.addTrackedPlayer(player_name);
+        CommandScheduler.addCommand(new ScheduledCommand("preference mod_vanish true", 500L));
         CommandScheduler.addCommand(new ScheduledCommand("server " + node_id));
         CommandScheduler.addCommand(new ScheduledCommand("tp " + player_name, 250L));
         if (FeatureManager.getFeature(ReportTeleport.class).runalts.getValue()) CommandScheduler.addCommand(new ScheduledCommand("alts " + player_name));
-        PlayerTracker.addTrackedPlayer(player_name);
     }
 
 
@@ -88,12 +92,28 @@ public final class ReportTeleport extends Feature implements ChatEventListener, 
         dispatcher.register(ClientCommandManager.literal("internal_report_teleport")
             .then(ClientCommandManager.argument("node_id", StringArgumentType.string())
                 .then(ClientCommandManager.argument("player_name", StringArgumentType.string())
+                        .then(ClientCommandManager.argument("hashcode", StringArgumentType.string())
                     .executes(commandContext -> {
-                        String player_name = StringArgumentType.getString(commandContext, "player_name");
+                        String offender = StringArgumentType.getString(commandContext, "offender");
                         String node_id = StringArgumentType.getString(commandContext, "node_id");
-                        internalReportTeleport(player_name, node_id);
+                        String hashcode = StringArgumentType.getString(commandContext, "hashcode");
+                        internalReportTeleport(offender, node_id);
+
+                        Mod.MC.execute(() -> {
+                            for (DatedReport report : FeatureManager.getFeature(ReportTracker.class).reports) {
+                                int reportHashcode = (report.reporter() + report.offender() + report.offender() + report.private_text() + report.node_text() + report.node_number() + report.mode()).hashCode();
+                                if (!report.handled()) {
+                                    if (reportHashcode == Integer.parseInt(hashcode)) {
+                                        report.setHandled(true);
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+
                         return 1;
                     })
+                )
                 )
             )
         );
