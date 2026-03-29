@@ -5,9 +5,11 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import mia.modmod.ColorBank;
 import mia.modmod.features.Categories;
 import mia.modmod.features.Feature;
+import mia.modmod.features.FeatureManager;
 import mia.modmod.features.impl.internal.commands.CommandScheduler;
 import mia.modmod.features.impl.internal.commands.ScheduledCommand;
 import mia.modmod.features.impl.moderation.tracker.PlayerOutliner;
+import mia.modmod.features.impl.moderation.tracker.PlayerTracker;
 import mia.modmod.features.listeners.ModifiableEventData;
 import mia.modmod.features.listeners.ModifiableEventResult;
 import mia.modmod.features.listeners.impl.ChatEventListener;
@@ -39,9 +41,9 @@ public final class ReportTeleport extends Feature implements ChatEventListener, 
     public static MutableComponent getFollowComponent(String offender, String node_formatted) {
         return Component.empty()
                 .append(Component.literal("Follow ").withColor(ColorBank.MC_GRAY))
-                .append(Component.literal(offender).withColor(ColorBank.WHITE))
+                .append(Component.literal(offender).withColor(ColorBank.WHITE_GRAY))
                 .append(Component.literal(" to ").withColor(ColorBank.MC_GRAY))
-                .append(Component.literal(node_formatted).withColor(ColorBank.WHITE)).copy();
+                .append(Component.literal(node_formatted).withColor(ColorBank.WHITE_GRAY)).copy();
     }
 
     @Override
@@ -72,6 +74,14 @@ public final class ReportTeleport extends Feature implements ChatEventListener, 
     }
 
 
+    public static void internalReportTeleport(String player_name, String node_id) {
+        CommandScheduler.addCommand(new ScheduledCommand("preference mod_vanish true"));
+        CommandScheduler.addCommand(new ScheduledCommand("server " + node_id));
+        CommandScheduler.addCommand(new ScheduledCommand("tp " + player_name, 250L));
+        if (FeatureManager.getFeature(ReportTeleport.class).runalts.getValue()) CommandScheduler.addCommand(new ScheduledCommand("alts " + player_name));
+        PlayerTracker.addTrackedPlayer(player_name);
+    }
+
 
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess) {
@@ -81,14 +91,7 @@ public final class ReportTeleport extends Feature implements ChatEventListener, 
                     .executes(commandContext -> {
                         String player_name = StringArgumentType.getString(commandContext, "player_name");
                         String node_id = StringArgumentType.getString(commandContext, "node_id");
-
-                    PlayerOutliner.addTrackedPlayer(player_name);
-                        CommandScheduler.addCommand(new ScheduledCommand("preference mod_vanish true"));
-                        CommandScheduler.addCommand(new ScheduledCommand("server " + node_id));
-                        CommandScheduler.addCommand(new ScheduledCommand("tp " + player_name, 250L));
-                        if (runalts.getValue()) CommandScheduler.addCommand(new ScheduledCommand("alts " + player_name));
-
-
+                        internalReportTeleport(player_name, node_id);
                         return 1;
                     })
                 )

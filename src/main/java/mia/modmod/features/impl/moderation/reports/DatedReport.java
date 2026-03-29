@@ -36,6 +36,7 @@ public class DatedReport{
     public boolean handled() { return handled; }
     
     public String formattedLocation() { return private_text() + node_text() + " " + node_number(); }
+    public String nodeIdentifier() { return private_text.isEmpty() ? "node" + node_number : "private" + node_number;}
 
     public void setHandled(boolean handled) { this.handled = handled; }
 }

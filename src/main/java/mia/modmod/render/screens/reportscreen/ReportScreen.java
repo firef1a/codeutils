@@ -1,14 +1,17 @@
 package mia.modmod.render.screens.reportscreen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import mia.modmod.ColorBank;
 import mia.modmod.Mod;
 import mia.modmod.core.MathUtils;
 import mia.modmod.features.FeatureManager;
 import mia.modmod.features.impl.moderation.reports.DatedReport;
+import mia.modmod.features.impl.moderation.reports.ReportTeleport;
 import mia.modmod.features.impl.moderation.reports.ReportTracker;
 import mia.modmod.render.screens.Animation;
 import mia.modmod.render.screens.AnimationStage;
 import mia.modmod.render.util.*;
+import mia.modmod.render.util.Point;
 import mia.modmod.render.util.elements.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,6 +23,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -31,6 +35,9 @@ public class ReportScreen extends Screen {
 
     private ArrayList<DrawButton> buttons = new ArrayList<>();
 
+    private DrawButton sliderContainer;
+    private boolean sliderMouseDown;
+
     private DrawRect reportContainer;
     private ArrayList<DrawButton> reportButtons;
 
@@ -41,7 +48,6 @@ public class ReportScreen extends Screen {
     private final int lineHeight = (Mod.MC.font.lineHeight + 1);
     private final int reportHeight = (lineHeight * 5) + (margin * 2);
 
-    private static String FILTER_PATTERN = "";
     private MultiLineEditBox filterWidget;
 
 
@@ -58,43 +64,47 @@ public class ReportScreen extends Screen {
         filterWidget = MultiLineEditBox.builder()
                 .setX(500)
                 .setY(500)
-                .setPlaceholder(Component.literal("filter reports...").withColor(ColorBank.MC_GRAY).withStyle(ChatFormatting.ITALIC))
+                .setPlaceholder(Component.literal("report filter...").withColor(ColorBank.MC_GRAY).withStyle(ChatFormatting.ITALIC))
                 .setShowBackground(true)
-                .build(Mod.MC.font, 250 - margin * 2, Mod.MC.font.lineHeight * 2 - 1, Component.empty());
+                .build(Mod.MC.font, 300 - margin * 2, Mod.MC.font.lineHeight * 2 - 1, Component.empty());
         filterWidget.setAlpha(0f);
         addRenderableWidget(filterWidget);
     }
 
     private boolean filterReport(DatedReport report, String filter) {
         for (String data : new String[] { report.reporter(), report.offender(), report.offense(), report.formattedLocation(), report.mode() }) {
-            if (data.toLowerCase(Locale.ROOT).contains(filter.toLowerCase(Locale.ROOT))) return true;
+            if (data.toLowerCase(Locale.ROOT).strip().contains(filter.toLowerCase(Locale.ROOT).strip())) return true;
         }
         return false;
     }
 
     private double reportDelta() {
-        return (reportButtons.size() * (reportHeight + 1)) - reportContainer.getHeight();
+        return Math.max(0, (reportButtons.size() * (reportHeight + 1)) - reportContainer.getHeight());
     }
 
     public void draw(GuiGraphics context, int mouseX, int mouseY) {
         Point screen = new Point(Mod.getScaledWindowWidth(), Mod.getScaledWindowHeight());
 
-        int mainContainerWidth = 250;
+        if (Mod.MC.options.getMenuBackgroundBlurriness() > 0) context.blurBeforeThisStratum();
+
+        int sideMargin = 5;
+        int mainContainerWidth = 300 + sideMargin *2;
         int mainContainerHeight = screen.y();
         this.buttons = new ArrayList<>();
 
+        DrawCustomToolTip[] customToolTip = new DrawCustomToolTip[1];
 
         int mainColor = ColorBank.BLACK;
         int buttonColor = 0x1f1f1f;
         int enabledColor = 0x3d3d3d;
 
-        DrawRect mainContainer = new DrawRect(screen.mul(0.5, 0.5).add((int)(50*(1-animation.getProgress())),0), new Point(mainContainerWidth, mainContainerHeight),  new ARGB(ColorBank.BLACK, 0.0f * animation.getProgress()));
+        DrawRect mainContainer = new DrawRect(screen.mul(0.5, 0.5).add((int)(50*(1-animation.getProgress())),0), new Point(mainContainerWidth, mainContainerHeight),  new ARGB(ColorBank.BLACK, 0.35f * animation.getProgress()));
         mainContainer.setSelfBinding(new DrawBinding(AxisBinding.MIDDLE, AxisBinding.MIDDLE));
 
         DrawRect titleContainer = new DrawRect(
-                new Point(0, margin),
-                new Point(mainContainer.getWidth(), lineHeight * 4),
-                new ARGB(mainColor, 0.45f * animation.getProgress()),
+                new Point(sideMargin, margin),
+                new Point(mainContainer.getWidth() - sideMargin * 2, lineHeight * 5),
+                new ARGB(mainColor, 0.6f * animation.getProgress()),
                 mainContainer
         );
 
@@ -108,30 +118,40 @@ public class ReportScreen extends Screen {
 
         reportContainer = new DrawRect(
                 new Point(0, margin),
-                new Point(mainContainer.getWidth(),  (screen.y() - (margin + titleContainer.y2()))),
+                new Point(titleContainer.getWidth(),  (screen.y() - (margin + titleContainer.y2()))),
                 new ARGB(mainColor, 0.0f * animation.getProgress()),
                 titleContainer
         )  {
             @Override
             public void render(GuiGraphics context, int mouseX, int mouseY) {
                 if (this.y2() >= reportContainer.y1()) {
-                    context.enableScissor(this.x1(), this.y1(), this.x2(), this.y2());
+                    context.enableScissor(0, this.y1(), screen.x(), screen.y());
                     super.render(context, mouseX, mouseY);
                     context.disableScissor();
                 }
-                /*
-                if (containsPoint(mouseX, mouseY)) {
-                    //DrawContextHelper.drawTooltip(context, optionInfo, mouseX, mouseY, 0);
-                    customToolTip[0] = new DrawCustomToolTip(new Point(mouseX, mouseY), optionInfo, 0);
-                }
-                 */
             }
         };
         reportContainer.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
 
+
+        int reportsFound = 0;
+        for (DatedReport report : FeatureManager.getFeature(ReportTracker.class).reports) {
+            if (!filterReport(report, filterWidget.getValue())) continue;
+            reportsFound++;
+        }
+
+        DrawText numReportsText = new DrawText(
+                new Point(0, 2),
+                Component.literal(reportsFound + " report" + (reportsFound == 1 ? "" : "s") + " found").withColor(ColorBank.MC_GRAY).withStyle(ChatFormatting.ITALIC),
+                animation.getProgress(),
+                true,
+                title
+        );
+        numReportsText.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
+
         filterWidget.setAlpha(animation.getProgress());
-        filterWidget.setX(title.x1());
-        filterWidget.setY(title.y2() + margin);
+        filterWidget.setX(numReportsText.x1());
+        filterWidget.setY(numReportsText.y2() + 3);
 
 
         reportButtons = new ArrayList<>();
@@ -140,22 +160,49 @@ public class ReportScreen extends Screen {
         for (DatedReport report : FeatureManager.getFeature(ReportTracker.class).reports) {
             if (!filterReport(report, filterWidget.getValue())) continue;
             String node_id = report.private_text().isEmpty() ? "node" + report.node_number() : "private" + report.node_number();
-            List<Component> reportText = List.of(
-                    Component.empty().append(Component.literal("Reported: ").withColor(0xFFAAAA).append(Component.literal(MathUtils.convertTimestampRelativeHMS(System.currentTimeMillis() - (Math.round(report.timestamp() / 1000.0) * 1000)) + " ago").withColor(ColorBank.WHITE_GRAY))),
+            ArrayList<Component> reportTextBody = new ArrayList<>(List.of(
                     Component.empty().append(Component.literal("!").withColor(0xFF2A00).withStyle(ChatFormatting.BOLD)).append(Component.literal(" Incoming Report ").withColor(0xFFAAAA)).append(Component.literal("(" + report.reporter() +")").withColor(ColorBank.MC_GRAY)),
                     Component.empty().append(Component.literal("|").withColor(ColorBank.MC_RED).append(Component.literal("  Offender: ").withColor(0xD4D4D4)).append(Component.literal(report.offender()).withColor(ColorBank.WHITE))),
                     Component.empty().append(Component.literal("|").withColor(ColorBank.MC_RED).append(Component.literal("  Offense: ").withColor(0xD4D4D4).append(Component.literal(report.offense()).withColor(ColorBank.WHITE)))),
                     Component.empty().append(Component.literal("|").withColor(ColorBank.MC_RED).append(Component.literal("  Location: ").withColor(0xD4D4D4).append(Component.literal(report.formattedLocation()).withColor(ColorBank.WHITE))))
-                    );
+            ));
+            ArrayList<Component> reportText = new ArrayList<>();
+            reportText.add(Component.empty().append(Component.literal("Reported: ").withColor(0xFFAAAA).append(Component.literal(MathUtils.convertTimestampRelativeHMS(System.currentTimeMillis() - (Math.round(report.timestamp() / 1000.0) * 1000)) + " ago").withColor(ColorBank.WHITE_GRAY))));
+            reportText.addAll(reportTextBody);
+
 
             DrawButton reportButton = new DrawButton(
                     new Point(0, ((reportHeight+1) * i)  - ((int) displayScrollAmount)),
-                    new Point(mainContainer.getWidth(), reportHeight),
-                    new ARGB(ColorBank.BLACK, 0.5f * animation.getProgress()),
-                    new ARGB(enabledColor, 0.7f * animation.getProgress()),
+                    new Point(reportContainer.getWidth(), reportHeight),
+                    new ARGB(ColorBank.BLACK, 0.7f * animation.getProgress()),
+                    new ARGB(enabledColor, 0.85f * animation.getProgress()),
                     reportContainer
-            );
+            ) {
+                @Override
+                public void render(GuiGraphics context, int mouseX, int mouseY) {
+                    context.enableScissor(this.x1(), this.y1(), this.x2(), this.y2());
+                    super.render(context, mouseX, mouseY);
+                    context.disableScissor();
+
+                    if (containsPoint(mouseX, mouseY)) {
+                        //DrawContextHelper.drawTooltip(context, optionInfo, mouseX, mouseY, 0);
+                        ArrayList<Component> tooltip = new ArrayList<>();
+                        tooltip.addAll(reportTextBody);
+                        tooltip.addAll(List.of(
+                                Component.literal(""),
+                                ReportTeleport.getFollowComponent(report.offender(), report.formattedLocation())
+                        ));
+                        customToolTip[0] = new DrawCustomToolTip(new Point(mouseX, mouseY), tooltip, 0);
+                    }
+                }
+            };
             reportButtons.add(reportButton);
+            buttons.add(reportButton);
+            reportButton.setCallback(() -> {
+                report.setHandled(true);
+                ReportTeleport.internalReportTeleport(report.offender(), report.nodeIdentifier());
+                onClose();
+            });
 
             DrawRect reportBottom = new DrawRect(
                     new Point(0,0),
@@ -193,8 +240,49 @@ public class ReportScreen extends Screen {
             i++;
         }
 
+
+        int sliderHeight = (int) ((double) (reportContainer.getHeight() - margin) * ((double) reportContainer.getHeight() / ((reportContainer.getHeight() + reportDelta()))));
+
+        sliderContainer = new DrawButton(
+                new Point(margin * 2, 0),
+                new Point(margin*2, reportContainer.getHeight() - margin),
+                new ARGB(ColorBank.BLACK, 0.7f * animation.getProgress()),
+                new ARGB(ColorBank.BLACK, 0.7f * animation.getProgress()),
+                reportContainer
+        ) {
+            @Override
+            public void leftMouseClick(MouseButtonEvent click, boolean doubled) {
+                sliderMouseDown = true;
+
+                double percentage = (((click.y()) - sliderContainer.y1()) / sliderContainer.getHeight());
+                percentage -= (0.5 - percentage) * (((double) sliderHeight / sliderContainer.getHeight()));
+                scrollAmount = Math.clamp(percentage, 0, 1) * reportDelta();
+
+                // this is still slightly broken but idk atp
+
+                scrollAmount = Math.clamp(
+                        scrollAmount,
+                        0,
+                        reportDelta()
+                );
+            };
+        };
+        sliderContainer.setParentBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.NONE));
+        buttons.add(sliderContainer);
+
+
+        DrawRect sliderBar = new DrawRect(
+                new Point(0, (int) ( (sliderContainer.getHeight() - sliderHeight) * (scrollAmount / reportDelta()))),
+                new Point(sliderContainer.getWidth(), sliderHeight),
+                new ARGB(ColorBank.WHITE_GRAY, 0.7f * animation.getProgress()),
+                sliderContainer
+        );
+
         displayScrollAmount = (displayScrollAmount) + ((scrollAmount - displayScrollAmount) / 1.5);
         mainContainer.render(context, mouseX, mouseY);
+        if (customToolTip[0] != null) {
+            customToolTip[0].render(context,mouseX,mouseY);
+        }
         updateAnimation();
     }
 
@@ -230,21 +318,20 @@ public class ReportScreen extends Screen {
         scrollAmount = Math.clamp(
                 scrollAmount,
                 0,
-                Math.max(
-                        0,
-                        reportDelta()
-                )
+                reportDelta()
         );
         return super.mouseScrolled(mouseX, mouseY, dx, dy);
     }
 
     @Override
     public boolean mouseReleased(@NonNull MouseButtonEvent click) {
+        sliderMouseDown = false;
         return super.mouseReleased(click);
     }
 
     @Override
     public boolean mouseDragged(@NonNull MouseButtonEvent click, double offsetX, double offsetY) {
+        if (sliderMouseDown) sliderContainer.leftMouseClick(click, false);
         return super.mouseDragged(click, offsetX, offsetY);
     }
 

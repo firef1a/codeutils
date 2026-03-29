@@ -4,6 +4,7 @@ import mia.modmod.ColorBank;
 import mia.modmod.Mod;
 import mia.modmod.features.FeatureManager;
 import mia.modmod.features.impl.moderation.tracker.PlayerOutliner;
+import mia.modmod.features.impl.moderation.tracker.PlayerTracker;
 import mia.modmod.render.screens.Animation;
 import mia.modmod.render.screens.AnimationStage;
 import mia.modmod.render.util.*;
@@ -21,7 +22,6 @@ import org.jspecify.annotations.NonNull;
 import java.util.ArrayList;
 
 public class ModQAScreen extends Screen {
-    private final PlayerOutliner playerOutliner;
     private final Screen parent;
     public final Animation animation;
 
@@ -35,8 +35,7 @@ public class ModQAScreen extends Screen {
         super(Component.literal("MODQA"));
         this.parent = parent;
         this.animation = new Animation(AnimationStage.OPENING, 0f, EasingFunctions::easeInOutCircular);
-        this.playerOutliner = FeatureManager.getFeature(PlayerOutliner.class);
-        if (!playerOutliner.getTrackedPlayers().isEmpty()) this.selectedPlayer = playerOutliner.getTrackedPlayers().getFirst();
+        if (!PlayerTracker.getTrackerPlayers().isEmpty()) this.selectedPlayer = PlayerTracker.getTrackerPlayers().getFirst();
     }
 
     private void setSelectedPlayer(String playerName) {
@@ -69,8 +68,8 @@ public class ModQAScreen extends Screen {
         int blockSize = Mod.MC.font.lineHeight + playerNameMargin * 2;
         Point playerContainerSize = new Point(sidebarContainer.getWidth(), blockSize);
         int i = 0;
-        if (!playerOutliner.getTrackedPlayers().isEmpty()) {
-            for (String playerName : playerOutliner.getTrackedPlayers()) {
+        if (!PlayerTracker.getTrackerPlayers().isEmpty()) {
+            for (String playerName : PlayerTracker.getTrackerPlayers()) {
                 DrawButton playerContainer = new DrawButton(
                         new Point(0, (playerContainerSize.y() + 1) * i),
                         playerContainerSize,
@@ -197,9 +196,9 @@ public class ModQAScreen extends Screen {
                     };
                     optionButton.setCallback(() -> {
                         Mod.sendCommand(command);
-                        playerOutliner.getTrackedPlayers().remove(selectedPlayer);
-                        if (!playerOutliner.getTrackedPlayers().isEmpty()) {
-                            setSelectedPlayer(playerOutliner.getTrackedPlayers().getFirst());
+                        PlayerTracker.getTrackerPlayers().remove(selectedPlayer);
+                        if (!PlayerTracker.getTrackerPlayers().isEmpty()) {
+                            setSelectedPlayer(PlayerTracker.getTrackerPlayers().getFirst());
                         } else {
                             setSelectedPlayer(null);
                         }

@@ -12,6 +12,7 @@ import mia.modmod.features.impl.general.chat.SimplifiedStaffChatTags;
 import mia.modmod.features.impl.internal.permissions.ModeratorPermission;
 import mia.modmod.features.impl.internal.permissions.Permissions;
 import mia.modmod.features.impl.internal.permissions.SupportPermission;
+import mia.modmod.features.impl.internal.server.ServerManager;
 import mia.modmod.features.listeners.ModifiableEventData;
 import mia.modmod.features.listeners.ModifiableEventResult;
 import mia.modmod.features.listeners.impl.ChatEventListener;
@@ -51,6 +52,7 @@ public final class ModQA extends Feature implements RegisterKeyBindEvent, TickEv
 
     @Override
     public void tickR(int tick) {
+        if (ServerManager.isNotOnDiamondFire()) return;
         if (openQA.isDown()) {
             if ((Mod.getCurrentScreen() == null)) Mod.setCurrentScreen(modQAScreen = new ModQAScreen(null));
         }

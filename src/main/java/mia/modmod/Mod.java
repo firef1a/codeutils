@@ -149,7 +149,7 @@ public class Mod implements ClientModInitializer {
 		message(message, 0xff695c, 0xff6052);
 	}
 	public static void messageError(String message) {
-		messageError(Component.literal(message));
+		messageError(Component.literal(message).withColor(ColorBank.MC_RED));
 	}
 
 

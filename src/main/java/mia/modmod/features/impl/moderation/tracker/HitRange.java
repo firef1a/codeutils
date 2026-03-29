@@ -52,7 +52,7 @@ public final class HitRange extends Feature {
         if (Mod.MC.level == null) return;
 
         HashMap<Integer, Player> playerIds = new HashMap<>();
-        for (String trackedName : FeatureManager.getFeature(PlayerOutliner.class).getTrackedPlayers()) {
+        for (String trackedName : PlayerTracker.getTrackerPlayers()) {
             for (Player player : Mod.MC.level.players()) {
                 if (player.nameAndId().name().equals(trackedName)) {
                     playerIds.put(player.getId(), player);

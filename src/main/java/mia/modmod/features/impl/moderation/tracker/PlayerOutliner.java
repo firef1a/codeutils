@@ -42,14 +42,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-public final class PlayerOutliner extends Feature implements RenderHUD, RegisterCommandListener, ServerConnectionEventListener, WorldRenderEventListener, PacketListener {
-    private final ArrayList<String> trackedPlayers;
+public final class PlayerOutliner extends Feature implements RenderHUD, ServerConnectionEventListener, WorldRenderEventListener, PacketListener {
     private final ColorDataField outlinerColor;
 
     public PlayerOutliner(Categories category) {
         super(category, "Player Outliner", "outliner", "outlines tracked players", new Permissions(SupportPermission.NONE, ModeratorPermission.JR_MOD));
         outlinerColor = new ColorDataField("Outline Color", new ParameterIdentifier(this, "outline_color"), new Color(0xed7aff), true);
-        trackedPlayers = new ArrayList<>();
     }
 
     @Override
@@ -62,9 +60,6 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         renderPlayerOutlines(context, tickCounter);
     }
 
-    public ArrayList<String> getTrackedPlayers() {
-        return trackedPlayers;
-    }
 
     private void renderTrackerList(GuiGraphics context, DeltaTracker tickCounter) {
         if (Mod.MC.getConnection() == null) return;
@@ -80,7 +75,7 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         containerTitle.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.MIDDLE));
 
         int i = 0;
-        for (String player : trackedPlayers) {
+        for (String player : PlayerTracker.getTrackerPlayers()) {
             boolean online = StreamUtils.getPlayerList(false).contains(player);
             int onlineColor = online ? ColorBank.MC_GREEN : ColorBank.MC_RED;
 
@@ -122,7 +117,7 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
             i++;
         }
 
-        if (!trackedPlayers.isEmpty()) container.render(context, 0, 0);
+        if (!PlayerTracker.getTrackerPlayers().isEmpty()) container.render(context, 0, 0);
     }
 
     private void renderPlayerOutlines(GuiGraphics context, DeltaTracker tickCounter) {
@@ -146,7 +141,7 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         for (Player playerEntity : Mod.MC.level.players()) {
             nodePlayers.put(playerEntity.getName().getString(), playerEntity);
 
-            if (playerEntity.getId() != Mod.MC.player.getId() && trackedPlayers.contains(playerEntity.getName().getString())) {
+            if (playerEntity.getId() != Mod.MC.player.getId() && PlayerTracker.getTrackerPlayers().contains(playerEntity.getName().getString())) {
                 if (frustum.isVisible(playerEntity.getBoundingBox())) {
                     renderPlayerOutline(context, playerEntity, tickCounter);
                 }
@@ -224,46 +219,6 @@ public final class PlayerOutliner extends Feature implements RenderHUD, Register
         return Component.literal(latency + "ms").withColor(color);
     }
 
-    public static void addTrackedPlayer(String name) {
-        if (!FeatureManager.getFeature(PlayerOutliner.class).trackedPlayers.contains(name)) FeatureManager.getFeature(PlayerOutliner.class).trackedPlayers.addFirst(name);
-    }
-
-    @Override
-    public void register(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess) {
-        dispatcher.register(ClientCommandManager.literal("track")
-                .then(ClientCommandManager.argument("username", StringArgumentType.string())
-                        .suggests((context, builder) -> {
-                            List<String> list = StreamUtils.getPlayerList(true);
-                            list.add("clear");
-                            list.addAll(trackedPlayers);
-                            return SharedSuggestionProvider.suggest(
-                                    list,
-                                    builder
-                            );
-                        })
-                        .executes(commandContext -> {
-                            String username = StringArgumentType.getString(commandContext, "username");
-
-                            if (username.equals("clear")) {
-                                Mod.message(Component.literal("Tracker Cleared!").withColor(ColorBank.WHITE).append(Component.literal(" (" + trackedPlayers.size() + " player" + (trackedPlayers.size() == 1 ? "" : "s") + ")").withColor(ColorBank.WHITE_GRAY)));
-                                trackedPlayers.clear();
-                                return 1;
-                            } else {
-                                if (trackedPlayers.contains(username)) {
-                                    trackedPlayers.remove(username);
-
-                                    Mod.message(Component.literal("Stopped Tracking: ").withColor(ColorBank.WHITE).append(Component.literal(username).withColor(ColorBank.WHITE_GRAY)));
-                                } else {
-                                    addTrackedPlayer(username);
-                                    Mod.message(Component.literal("Tracking: ").withColor(ColorBank.WHITE).append(Component.literal(username).withColor(ColorBank.WHITE_GRAY)));
-                                }
-                            }
-
-                            return 1;
-                        })
-                )
-        );
-    }
 
     @Override
     public void DFConnectJoin(ClientPacketListener networkHandler) {

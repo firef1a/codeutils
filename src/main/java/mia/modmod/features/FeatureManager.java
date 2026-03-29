@@ -19,6 +19,7 @@ import mia.modmod.features.impl.moderation.VanishFly;
 import mia.modmod.features.impl.moderation.reports.ReportTeleport;
 import mia.modmod.features.impl.moderation.tracker.HitRange;
 import mia.modmod.features.impl.moderation.tracker.PlayerOutliner;
+import mia.modmod.features.impl.moderation.tracker.PlayerTracker;
 import mia.modmod.features.impl.support.AutoQueue;
 import mia.modmod.features.impl.support.hud.SupportHUD;
 import mia.modmod.features.listeners.AbstractEventListener;
@@ -63,6 +64,7 @@ public final class FeatureManager {
         add(new BetterVanishMSG(Categories.MODERATION));
         add(new VanishFly(Categories.MODERATION));
         add(new ReportTeleport(Categories.MODERATION));
+        add(new PlayerTracker(Categories.MODERATION));
         add(new HitRange(Categories.MODERATION));
         add(new PlayerOutliner(Categories.MODERATION));
         add(new ModQA(Categories.MODERATION));
