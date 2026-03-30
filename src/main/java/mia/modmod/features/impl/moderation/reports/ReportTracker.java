@@ -17,9 +17,6 @@ import mia.modmod.features.listeners.impl.ChatEventListener;
 import mia.modmod.features.listeners.impl.RegisterKeyBindEvent;
 import mia.modmod.features.listeners.impl.RenderHUD;
 import mia.modmod.features.listeners.impl.TickEvent;
-import mia.modmod.features.parameters.ParameterIdentifier;
-import mia.modmod.features.parameters.impl.BooleanDataField;
-import mia.modmod.features.parameters.impl.IntegerDataField;
 import mia.modmod.render.screens.AnimationStage;
 import mia.modmod.render.screens.reportscreen.ReportScreen;
 import net.minecraft.client.DeltaTracker;
@@ -29,7 +26,6 @@ import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,7 +36,7 @@ public final class ReportTracker extends Feature implements RegisterKeyBindEvent
 
     public ReportTracker(Categories category) {
         super(category, "Report Tracker", "report_tracker", "Shows recent reports", new Permissions(SupportPermission.NONE, ModeratorPermission.JR_MOD));
-        openQA = new MiaKeyBind("Open Report Screen", GLFW.GLFW_KEY_O, KeyBindCategories.GENERAL_CATEGORY);
+        openQA = new MiaKeyBind("Open Report Screen", GLFW.GLFW_KEY_O, KeyBindCategories.STAFF);
         reports = new ArrayList<>();
   }
 

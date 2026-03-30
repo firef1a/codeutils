@@ -1,11 +1,10 @@
 package mia.modmod.core;
 
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.Identifier;
 
 public class MiaKeyBind extends KeyMapping {
     private long lastPressed;
-    private long threshold = 100L;
+    private static final long threshold = 100L;
     public boolean down;
     public Runnable onKeyDown;
 
@@ -15,8 +14,7 @@ public class MiaKeyBind extends KeyMapping {
     }
 
     public MiaKeyBind(String translationKey, int code, KeyBindCategories category, Runnable onKeyDown) {
-        //super(translationKey, code, Category.register(Identifier.fromNamespaceAndPath(Mod.MOD_ID, category.displayName())));
-        super(translationKey, code, Category.register(Identifier.fromNamespaceAndPath("test", "sadf" + Math.random())));
+        super(translationKey, code, category.getCategory());
         this.onKeyDown = onKeyDown;
         lastPressed = 0L;
     }
@@ -31,10 +29,6 @@ public class MiaKeyBind extends KeyMapping {
         }
     }
 
-    public boolean rawIsDown() {
-        return super.isDown();
-    }
-
     public boolean isDown() {
         long currentTime = System.currentTimeMillis();
         long diff = currentTime - lastPressed;
@@ -42,7 +36,7 @@ public class MiaKeyBind extends KeyMapping {
         if (super.isDown()) {
             lastPressed = currentTime;
             return true;
-        };
+        }
         return false;
     }
 }

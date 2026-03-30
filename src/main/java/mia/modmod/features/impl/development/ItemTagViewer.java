@@ -50,7 +50,7 @@ public final class ItemTagViewer extends Feature implements RenderTooltip, Regis
         stringValueColor = new ColorDataField("String Value Color", "", ParameterIdentifier.of(this, "string_value_color"), new Color(0xbdd7ff), true);
         numberValueColor = new ColorDataField("Number Value Color", "", ParameterIdentifier.of(this, "number_value_color"), new Color(0xff5555), true);
 
-        showItemTagsKeybind = new MiaKeyBind("Show Hypercube Item Tag", GLFW.GLFW_KEY_LEFT_ALT, KeyBindCategories.DEVELOPMENT_CATEGORY, () -> {
+        showItemTagsKeybind = new MiaKeyBind("Show Hypercube Item Tag", GLFW.GLFW_KEY_LEFT_ALT, KeyBindCategories.DEVELOPMENT, () -> {
             showItemTags = !showItemTags;
         });
     }
