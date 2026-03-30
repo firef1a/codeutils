@@ -35,6 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// deprecated !!!
+
+@Deprecated
 public final class ChestViewer extends Feature implements RenderHUD, PacketListener {
     private BlockPos lastBlockPos;
     private BlockPos currentChestPos;
