@@ -37,8 +37,8 @@ public class ChronoTimestamp {
                 (((years > 0) ? years + (expandedForm ? " years, ": "y") : "")) +
                         (((days > 0) ? days + (expandedForm ? " days, ": "d") : "")) +
                         ((years > 0) ? "" : ((hours > 0) ? hours + (expandedForm ? " hours, ": "h") : "")) +
-                        ((years > 0) ? "" : ((minutes > 0) ? minutes + (expandedForm ? " minutes, ": "m") : "")) +
-                        ((years > 0) ? "" : (seconds + (expandedForm ? " seconds, ": "s")))
+                        (((years > 0) || (days > 0))? "" : ((minutes > 0) ? minutes + (expandedForm ? " minutes, ": "m") : "")) +
+                        (((years > 0) || (days > 0)) ? "" : (seconds + (expandedForm ? " seconds, ": "s")))
         ).stripTrailing();
         if (dateString.endsWith(",")) dateString = dateString.substring(0, dateString.length()-1);
         return dateString;

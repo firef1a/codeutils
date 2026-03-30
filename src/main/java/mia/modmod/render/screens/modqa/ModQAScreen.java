@@ -210,6 +210,20 @@ public class ModQAScreen extends Screen {
                 k++;
             }
 
+            k = 1;
+            for (Component component : FeatureManager.getFeature(PlayerTracker.class).getTrackedHistoryLastestPunishmentText(selectedPlayer)) {
+                DrawText lastestPunishment = new DrawText(
+                        new Point(-playerNameMargin, playerNameMargin + ((font.lineHeight+1) * k)),
+                        component,
+                        animation.getProgress(),
+                        true,
+                        historyContainer
+                );
+                lastestPunishment.setParentBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.NONE));
+                lastestPunishment.setSelfBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.NONE));
+                k++;
+            }
+
 
 
             for (OptionButtonList optionButtonList : new OptionButtonList[]{ new OptionButtonList(banOptions, banContainerTitle) , new OptionButtonList(muteOptions, muteContainerTitle) }) {

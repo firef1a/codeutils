@@ -107,9 +107,7 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
                 Component trackEntry = Component.literal( entry.getKey().getReasonText() + " ").withColor(ColorBank.WHITE_GRAY)
                         .append(Component.literal("[" + entry.getValue().size() + "]").withColor(ColorBank.MC_RED));
 
-                //.append(Component.literal(" Latest: " + ChronoTimestamp.ABSOLUTE_from_Timestamp(earliestTimestamp).PAST_DHMS_string(true) + " ago").withColor(ColorBank.MC_GRAY));
 
-                /*
                 if (PunishmentTrack.expiringPunishments.contains(entry.getKey())) {
                     int numInvalidPunishments = 0;
                     if (PunishmentTrack.expiringPunishments.contains(entry.getKey())) {
@@ -119,9 +117,9 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
                             }
                         }
                     }
-                    if (numInvalidPunishments > 0) trackEntry = trackEntry.copy().append(Component.literal(" (" + numInvalidPunishments + " Expired Punishment" + (numInvalidPunishments == 1 ? "" : "s") + ")").withColor(ColorBank.WHITE));
+                    if (numInvalidPunishments > 0) trackEntry = trackEntry.copy().append(Component.literal(" (" + numInvalidPunishments + " uncounted)").withColor(ColorBank.MC_GRAY));
                 }
-                 */
+
                 text.add(trackEntry);
             }
         }
@@ -150,6 +148,22 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
             }
         }
 
+        return text;
+    }
+
+    public ArrayList<Component> getTrackedHistoryLastestPunishmentText(String player) {
+        ArrayList<Component> text = new ArrayList<>();
+
+        for (Map.Entry<PunishmentTrack, ArrayList<PunishmentData>> entry : trackedPlayerPunishmentTracks.get(player).getTrackedPunishments().entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                long earliestTimestamp = 0;
+
+                for (PunishmentData punishmentData : entry.getValue()) {
+                    if (punishmentData.chronoTimestamp().getTimestamp() > earliestTimestamp) earliestTimestamp = punishmentData.chronoTimestamp().getTimestamp();
+                }
+                text.add(Component.literal(" Latest: " + ChronoTimestamp.ABSOLUTE_from_Timestamp(earliestTimestamp).PAST_DHMS_string(true) + " ago").withColor(ColorBank.MC_GRAY));
+            }
+        }
         return text;
     }
 
@@ -185,7 +199,7 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
             String activeExpired = (matcher.groupCount() >= 5 && matcher.group(5) != null) ? matcher.group(5) : "Expired";
             PunishmentTrack punishmentTrack = null;
 
-            if (!offender.equals(issuer) || true) {
+            if (!offender.equals(issuer)) {
                 for (PunishmentTrack track : PunishmentTrack.values()) {
                     for (String pattern : track.getPatterns()) {
                         if (Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(reason).find()) {
