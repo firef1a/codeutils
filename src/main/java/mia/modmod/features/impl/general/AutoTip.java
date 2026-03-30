@@ -22,12 +22,12 @@ public final class AutoTip extends Feature implements ChatEventListener {
     private final DoubleDataField autoTipDelay;
     public AutoTip(Categories category) {
         super(category, "Auto Tip", "autotip", "Automatically tips boosters", Permissions.NONE);
-        autoTipDelay = new DoubleDataField("Auto Tip Delay (seconds)", "", ParameterIdentifier.of(this, "delay'"), 1.0, true);
+        autoTipDelay = new DoubleDataField("Auto Tip Delay (seconds)", "", ParameterIdentifier.of(this, "delay"), 0.0, true);
     }
 
     @Override
     public ModifiableEventResult<Component> chatEvent(ModifiableEventData<Component> message, CallbackInfo ci) {
-        if (Pattern.matches("^⏵⏵⏵ Use /tip to show your appreciation and receive a □ token notch!", message.base().getString())) {
+        if (Pattern.matches("^⏵+ Use /tip to show your appreciation and receive a □ token notch!", message.base().getString())) {
             CommandScheduler.addCommand(new ScheduledCommand("tip", Math.max((long) (autoTipDelay.getValue() * 1000L), 0L)));
         }
         return message.pass();
