@@ -16,6 +16,6 @@ public record ScheduledCommand(String command, long delay, List<ChatConsumer> co
         this(command, 0L);
     }
     public long getDelay() {
-        return (50L * (command.length()) + 25L) + 100L;
+        return (50L * (command.length()) + 25L) + 250L;
     }
 }

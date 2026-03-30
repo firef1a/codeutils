@@ -14,6 +14,8 @@ import mia.modmod.features.listeners.impl.ChatEventListener;
 import mia.modmod.features.listeners.impl.RenderHUD;
 import mia.modmod.features.listeners.impl.ServerConnectionEventListener;
 import mia.modmod.features.listeners.impl.TickEvent;
+import mia.modmod.features.parameters.ParameterIdentifier;
+import mia.modmod.features.parameters.impl.IntegerDataField;
 import mia.modmod.render.util.ARGB;
 import mia.modmod.render.util.AxisBinding;
 import mia.modmod.render.util.DrawBinding;
@@ -31,6 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,9 +48,11 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
 
     private static DrawRect supportHUDContainer;
 
+    private final IntegerDataField maxWidthDataField;
+
     public SupportHUD(Categories category) {
         super(category, "Support HUD", "supporthud", "get back to work wageslave, put on that customer service smile and earn those sparks!", new Permissions(SupportPermission.HELPER, ModeratorPermission.NONE));
-
+        maxWidthDataField = new IntegerDataField("Max HUD Text Width", "Maximum width in number of pixels the HUD is allowed to take up before it wraps session reason texts.", ParameterIdentifier.of(this, "max_width"), 300, true);
     }
 
     @Override
@@ -120,11 +125,32 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
         return message.pass();
     }
 
+
+    private ArrayList<String> wrapText(String text, int maxWidth) {
+        //return new ArrayList<>(List.of(text));
+        int lineNum = 0;
+
+        ArrayList<String> textList = new ArrayList<>();
+        while (Mod.MC.font.width(text) > maxWidth) {
+            for (int i = 0; i < text.length(); i++) {
+                String subString = text.substring(0, i);
+                if (Mod.MC.font.width(subString) >= maxWidth && text.charAt(i - 1) == ' ' || i == text.length()-1) {
+                    text = text.substring(i);
+                    textList.add(lineNum > 0 ? "    " + subString : subString);
+                    lineNum++;
+                    break;
+                }
+            }
+        }
+        textList.add(lineNum > 0 ? "    " + text : text);
+        return textList;
+    }
+
     @Override
     public void renderHUD(GuiGraphics context, DeltaTracker tickCounter) {
         int containerMargin = 3;
         int lineSpacing = 1;
-        int maxTextWidth = 300;
+        int maxTextWidth = (maxWidthDataField.getValue() < 10) ? 10 : maxWidthDataField.getValue();
         int screenEdgeMargin = 5;
 
         Mod.MC.execute(() -> {
@@ -148,12 +174,14 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
                                 )
                 );
 
+                List<String> list = wrapText(currentSupportSession.reason, maxTextWidth);
                 textList.add(
                         Component.literal(" ▶ ").withColor(0xc2c5ff)
                                 .append(
-                                        Component.literal(currentSupportSession.reason).withColor(ColorBank.WHITE)
+                                        Component.literal(list.remove(0)).withColor(ColorBank.WHITE)
                                 )
                 );
+                for (String each : list) textList.add(Component.literal(each));
 
 
                 int maxComponentWidth = 0;
@@ -180,13 +208,14 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
                                                     )
                                     )
                     );
-
+                    List<String> list = wrapText(sessionEntry.reason, maxTextWidth);
                     textList.add(
                             Component.literal(" ▶ ").withColor(0xc2c5ff)
                                     .append(
-                                            Component.literal(sessionEntry.reason).withColor(ColorBank.WHITE)
+                                            Component.literal(list.remove(0)).withColor(ColorBank.WHITE)
                                     )
                     );
+                    for (String each : list) textList.add(Component.literal(each));
                 }
                 supportTextLists.add(textList);
             }
@@ -209,25 +238,28 @@ public final class SupportHUD extends Feature implements RenderHUD, ChatEventLis
                                                     )
                                     )
                     );
+
+                    List<String> list = wrapText(questionEntry.message(), maxTextWidth);
                     textList.add(
                             Component.literal(" - ").withColor(ColorBank.MC_GRAY)
                                     .append(
-                                            Component.literal(questionEntry.message()).withColor(ColorBank.WHITE)
+                                            Component.literal(list.remove(0)).withColor(ColorBank.WHITE)
                                     )
                     );
+                    for (String each : list) textList.add(Component.literal(each));
                 }
                 supportTextLists.add(textList);
             }
 
             if (!supportTextLists.isEmpty()) {
-                int maxWidth = 0;
+                int largestWidth = 0;
                 for (ArrayList<Component> components : supportTextLists) {
                     for (Component component : components) {
                         int w = Mod.MC.font.width(component.getString());
-                        if (w > maxWidth) maxWidth = w;
+                        if (w > largestWidth) largestWidth = w;
                     }
                 }
-                int containerWidth = maxWidth + (containerMargin * 2);
+                int containerWidth = largestWidth + (containerMargin * 2);
                 supportHUDContainer = new DrawRect(
                         new Point(Mod.getScaledWindowWidth() - (containerWidth + screenEdgeMargin), screenEdgeMargin),
                         new Point(0, 0),
