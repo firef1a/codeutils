@@ -18,6 +18,7 @@ import mia.modmod.features.listeners.impl.RegisterCommandListener;
 import mia.modmod.features.listeners.impl.TickEvent;
 import mia.modmod.features.parameters.ParameterIdentifier;
 import mia.modmod.features.parameters.impl.BooleanDataField;
+import mia.modmod.features.parameters.impl.StringDataField;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandBuildContext;
@@ -32,16 +33,22 @@ import java.util.regex.Pattern;
 
 public final class ReportTeleport extends Feature implements ChatEventListener, RegisterCommandListener, TickEvent {
     public static final Pattern REPORT_PATTERN = Pattern.compile("^! Incoming Report \\(([A-Za-z0-9_]{3,16})\\)\\n\\|  Offender: ([A-Za-z0-9_]{3,16})\\n\\|  Offense: (.*)\\n\\|  Location: (Private |)(.*) (\\d*) ((?:Mode|Spawn|Existing).*)$");
+
     private final BooleanDataField runalts;
+    private final BooleanDataField msgOnReportTeleport;
+
     public static boolean requestingHistory = false;
     private static boolean isInternalReportTeleport = false;
 
     private static String requestPlayerName;
     private static String requestNodeID;
 
+    public static final String HASH_PREFIX = "handling report ID=";
+
     public ReportTeleport(Categories category) {
         super(category, "ReportTeleport", "reportteleport", "Click on report msgs to teleport the offender.");
         runalts = new BooleanDataField("Run /alts", "Runs /alts when you click on a report", ParameterIdentifier.of(this, "runalts"), true, true);
+        msgOnReportTeleport = new BooleanDataField("Send /mb Handled Message Hash", "Send an automated message when you click on a new report\n\n'" + HASH_PREFIX + "$HASH' $HASH is a hash of the report.\n\nOther mods using " + Mod.MOD_ID + " will mark the report with the same hash as handled.", ParameterIdentifier.of(this, "report_msg_hash"), true, true);
 
     }
 
@@ -73,12 +80,12 @@ public final class ReportTeleport extends Feature implements ChatEventListener, 
             String node_formatted = private_text + node_text + " " + node_number;
             String node_id = is_private ? "node" + node_number : "private" + node_number;
 
-            int hashCode = (reporter + offender + offender + private_text + node_text + node_number + mode).hashCode();
+            int reportHash = new DatedReport(reporter, offender, offense, private_text, node_text, node_number, mode, System.currentTimeMillis()).getReportHash();
 
             return message.modified(message.modified().copy().withStyle(
                     style -> style.withHoverEvent(new HoverEvent.ShowText(
                     getFollowComponent(offender, node_formatted)))
-                            .withClickEvent(new ClickEvent.RunCommand("/internal_report_teleport " + node_id + " " + offender + " " + hashCode))));
+                            .withClickEvent(new ClickEvent.RunCommand("/internal_report_teleport " + node_id + " " + offender + " " + reportHash))));
         }
         return message.pass();
     }
@@ -110,6 +117,13 @@ public final class ReportTeleport extends Feature implements ChatEventListener, 
 
     }
 
+    public static void sendModChatReportHash(int hashcode) {
+        if (FeatureManager.getFeature(ReportTeleport.class).msgOnReportTeleport.getValue()) {
+            CommandScheduler.addCommand(new ScheduledCommand("mb " + HASH_PREFIX + hashcode));
+            //Mod.messageError(HASH_PREFIX + hashcode);
+        }
+    }
+
     @Override
     public void register(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess) {
         dispatcher.register(ClientCommandManager.literal("internal_report_teleport")
@@ -120,20 +134,20 @@ public final class ReportTeleport extends Feature implements ChatEventListener, 
                         String offender = StringArgumentType.getString(commandContext, "offender");
                         String node_id = StringArgumentType.getString(commandContext, "node_id");
                         String hashcode = StringArgumentType.getString(commandContext, "hashcode");
-                        internalReportTeleport(offender, node_id);
 
                         Mod.MC.execute(() -> {
                             for (DatedReport report : FeatureManager.getFeature(ReportTracker.class).reports) {
-                                int reportHashcode = (report.reporter() + report.offender() + report.offender() + report.private_text() + report.node_text() + report.node_number() + report.mode()).hashCode();
                                 if (!report.handled()) {
-                                    if (reportHashcode == Integer.parseInt(hashcode)) {
+                                    if (report.getReportHash() == Integer.parseInt(hashcode)) {
                                         report.setHandled(true);
+                                        sendModChatReportHash(report.getReportHash());
                                         break;
                                     }
                                 }
                             }
                         });
 
+                        internalReportTeleport(offender, node_id);
                         return 1;
                     })
                 )

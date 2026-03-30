@@ -38,18 +38,11 @@ public final class ReportTracker extends Feature implements RegisterKeyBindEvent
     private ReportScreen reportScreen;
     public ArrayList<DatedReport> reports;
 
-    private static final String[] VALID_REPORT_HANDLED_MESSAGES = { "report handled", "handling report", "on it", "handled report" };
-
-    private final IntegerDataField reportHandledTimespan;
-
-
     public ReportTracker(Categories category) {
         super(category, "Report Tracker", "report_tracker", "Shows recent reports", new Permissions(SupportPermission.NONE, ModeratorPermission.JR_MOD));
         openQA = new MiaKeyBind("Open Report Screen", GLFW.GLFW_KEY_O, KeyBindCategories.GENERAL_CATEGORY);
         reports = new ArrayList<>();
-
-        reportHandledTimespan = new IntegerDataField("Report Handled Timespan (seconds)", "How long after a report has been sent can someone say they handled the report in modchat", ParameterIdentifier.of(this, "handled_timespan"), 30, true);
-    }
+  }
 
     @Override
     public ModifiableEventResult<Component> chatEvent(ModifiableEventData<Component> message, CallbackInfo ci) {
@@ -71,24 +64,19 @@ public final class ReportTracker extends Feature implements RegisterKeyBindEvent
             reports.addFirst(new DatedReport(reporter, offender, offense, private_text, node_text, node_number, mode, timestamp));
         }
 
-        Matcher mbMatcher = Pattern.compile("^\\[MOD] ([a-zA-Z0-9_]{3,16}): (" + String.join("|", VALID_REPORT_HANDLED_MESSAGES) + ")").matcher(content);
+        Matcher mbMatcher = Pattern.compile("^\\[MOD] ([a-zA-Z0-9_]{3,16}): " + ReportTeleport.HASH_PREFIX + "(\\d+)").matcher(content);
         if (mbMatcher.find()) {
-            Mod.message(mbMatcher.group(1));
             if (!mbMatcher.group(1).equals(Mod.getPlayerName())) {
                 for (DatedReport report : reports) {
-                    if (System.currentTimeMillis() - report.timestamp() < (1000L * reportHandledTimespan.getValue())) {
-                        Mod.message(report.reporter());
-                        if (!report.handled()) {
-                            report.setHandled(true);
-                            Mod.message(
-                                    Component.literal("Report by ")
-                                            .append(Component.literal(report.reporter()).withColor(ColorBank.WHITE_GRAY))
-                                            .append(" of ")
-                                            .append(Component.literal(report.offender()).withColor(ColorBank.WHITE_GRAY))
-                                            .append(Component.literal(" set to "))
-                                            .append(Component.literal("Handled").withColor(ColorBank.MC_GREEN))
-                            );
-                        }
+                    if (!report.handled() && report.getReportHash() == Integer.parseInt(mbMatcher.group(2))) {
+                        report.setHandled(true);
+                        Mod.message(
+                                Component.literal("Report ").withColor(ColorBank.WHITE)
+                                        .append(Component.literal("ID=" + report.getReportHash()).withColor(ColorBank.WHITE_GRAY))
+                                        .append(Component.literal(" set to ").withColor(ColorBank.WHITE))
+                                        .append(Component.literal("Handled").withColor(ColorBank.MC_GREEN))
+                        );
+                        break;
                     }
                 }
             }

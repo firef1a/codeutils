@@ -115,6 +115,8 @@ public class Mod implements ClientModInitializer {
 			if (Mod.MC.getConnection() != null) {
 				Mod.MC.getConnection().sendCommand(command.substring(1));
 			}
+		} else {
+			Mod.messageError("tried to execute '" + command + "'" + " but doesn't have '/' prefix, are you sure this is supposed to be a command? (report to developers)");
 		}
 	}
 

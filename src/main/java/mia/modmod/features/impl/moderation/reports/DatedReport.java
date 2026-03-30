@@ -37,6 +37,8 @@ public class DatedReport{
     
     public String formattedLocation() { return private_text() + node_text() + " " + node_number(); }
     public String nodeIdentifier() { return private_text.isEmpty() ? "node" + node_number : "private" + node_number;}
+    
+    public int getReportHash() { return Math.abs((reporter() + offender() + offender() + private_text() + node_text() + node_number() + mode()).hashCode()) % 1000000; }
 
     public void setHandled(boolean handled) { this.handled = handled; }
 }

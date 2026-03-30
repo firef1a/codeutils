@@ -70,7 +70,7 @@ public class ReportScreen extends Screen {
     }
 
     private boolean filterReport(DatedReport report, String filter) {
-        for (String data : new String[] { report.reporter(), report.offender(), report.offense(), report.formattedLocation(), report.mode() }) {
+        for (String data : new String[] { report.reporter(), report.offender(), report.offense(), report.formattedLocation(), report.mode(), String.valueOf(report.getReportHash()) }) {
             if (data.toLowerCase(Locale.ROOT).strip().contains(filter.toLowerCase(Locale.ROOT).strip())) return true;
         }
         return false;
@@ -197,8 +197,12 @@ public class ReportScreen extends Screen {
             reportButtons.add(reportButton);
             buttons.add(reportButton);
             reportButton.setCallback(() -> {
-                report.setHandled(true);
+                if (!report.handled()) {
+                    report.setHandled(true);
+                    ReportTeleport.sendModChatReportHash(report.getReportHash());
+                }
                 ReportTeleport.internalReportTeleport(report.offender(), report.nodeIdentifier());
+
                 onClose();
             });
 
@@ -222,6 +226,16 @@ public class ReportScreen extends Screen {
             );
             handledStatus.setParentBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.NONE));
             handledStatus.setSelfBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.NONE));
+
+            DrawText idText = new DrawText(
+                    new Point(0, 0),
+                    Component.literal("ID=" + report.getReportHash()).withColor(ColorBank.MC_GRAY),
+                    animation.getProgress(),
+                    true,
+                    handledStatus
+            );
+            idText.setParentBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.FULL));
+            idText.setSelfBinding(new DrawBinding(AxisBinding.FULL, AxisBinding.NONE));
 
             int j = 0;
             for (Component line : reportText) {
