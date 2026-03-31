@@ -33,12 +33,6 @@ public final class ItemTagViewer extends Feature implements RenderTooltip, Regis
     private static ColorDataField stringValueColor;
     private static ColorDataField numberValueColor;
 
-    //private static final int componentDataKeyColor = 0x9cffca;
-    //private static final int cKeyColor = 0xaaaaff;
-
-    private final MiaKeyBind showItemTagsKeybind;
-    private boolean showItemTags;
-
     private static final Component tagText = Component.literal("› ").withColor(ColorBank.MC_GRAY).append(Component.literal("Tags:").withColor(ColorBank.WHITE));
     private static final Component delimiterText = Component.literal(" : ").withColor(ColorBank.MC_DARK_GRAY);
 
@@ -50,9 +44,6 @@ public final class ItemTagViewer extends Feature implements RenderTooltip, Regis
         stringValueColor = new ColorDataField("String Value Color", "", ParameterIdentifier.of(this, "string_value_color"), new Color(0xbdd7ff), true);
         numberValueColor = new ColorDataField("Number Value Color", "", ParameterIdentifier.of(this, "number_value_color"), new Color(0xff5555), true);
 
-        showItemTagsKeybind = new MiaKeyBind("Show Hypercube Item Tag", GLFW.GLFW_KEY_LEFT_ALT, KeyBindCategories.DEVELOPMENT, () -> {
-            showItemTags = !showItemTags;
-        });
     }
 
     public static List<Component> getItemLoreWithTags(ItemStack item) {
@@ -109,7 +100,7 @@ public final class ItemTagViewer extends Feature implements RenderTooltip, Regis
 
     @Override
     public void registerKeyBind() {
-        KeyBindManager.registerKeyBind(showItemTagsKeybind);
+        //KeyBindManager.registerKeyBind(showItemTagsKeybind);
     }
 
     @Override
@@ -119,7 +110,7 @@ public final class ItemTagViewer extends Feature implements RenderTooltip, Regis
 
     @Override
     public void tickF(int tick) {
-        showItemTagsKeybind.tick();
+        //showItemTagsKeybind.tick();
     }
 }
 
