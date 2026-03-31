@@ -1,5 +1,6 @@
 package mia.modmod.features.impl.general.chat;
 
+import mia.modmod.ColorBank;
 import mia.modmod.features.Categories;
 import mia.modmod.features.Feature;
 import mia.modmod.features.listeners.ModifiableEventData;
@@ -20,7 +21,7 @@ public final class SimplifiedStaffChatTags extends Feature implements ChatEventL
     public static final Component SUPPORT = getPrefix(0x55aaff);
     public static final Component SR_HELPER = getPrefix(0x7fffd4);
     public static final Component MOD = getPrefix(0x2ad42a);
-    public static final Component ADMIN = getPrefix(0x2a70d4);
+    public static final Component ADMIN = getPrefix(ColorBank.DF_ADMIN);//0xff4124
 
     private static Component getPrefix(int color) { return Component.empty().append(literal("›").withColor(color)); }
 

@@ -12,7 +12,6 @@ import mia.modmod.features.impl.internal.mode.LocationAPI;
 import mia.modmod.features.impl.internal.server.ServerManager;
 import mia.modmod.features.impl.internal.staff.VanishTracker;
 import mia.modmod.features.impl.internal.superdupertopsecrte.VerboseLogger;
-import mia.modmod.features.impl.moderation.BetterVanishMSG;
 import mia.modmod.features.impl.moderation.ModQA;
 import mia.modmod.features.impl.moderation.reports.ReportTracker;
 import mia.modmod.features.impl.moderation.VanishFly;
@@ -62,7 +61,6 @@ public final class FeatureManager {
         add(new AutoQueue(Categories.SUPPORT));
         add(new SupportHUD(Categories.SUPPORT));
 
-        add(new BetterVanishMSG(Categories.MODERATION));
         add(new VanishFly(Categories.MODERATION));
         add(new ReportTeleport(Categories.MODERATION));
         add(new PlayerTracker(Categories.MODERATION));

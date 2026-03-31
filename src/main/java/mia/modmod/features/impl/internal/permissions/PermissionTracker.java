@@ -7,6 +7,7 @@ import mia.modmod.Mod;
 import mia.modmod.config.ConfigStore;
 import mia.modmod.features.Categories;
 import mia.modmod.features.Feature;
+import mia.modmod.features.FeatureManager;
 import mia.modmod.features.impl.internal.commands.ChatConsumer;
 import mia.modmod.features.impl.internal.commands.CommandScheduler;
 import mia.modmod.features.impl.internal.commands.ScheduledCommand;
@@ -41,11 +42,12 @@ public final class PermissionTracker extends Feature implements AlwaysEnabled, S
         adminPermission = new BooleanDataField("Admin Permission", warningDescription, ParameterIdentifier.of(this, "admin_permission"), false, true);
     }
 
-    public  Permissions getPlayerPermissions() {
+    public static Permissions getPlayerPermissions() {
+        PermissionTracker permissionTracker = FeatureManager.getFeature(PermissionTracker.class);
         return new Permissions(
-                supportPermission.getValue(),
-                moderatorPermission.getValue(),
-                adminPermission.getValue()
+                permissionTracker.supportPermission.getValue(),
+                permissionTracker.moderatorPermission.getValue(),
+                permissionTracker.adminPermission.getValue()
         );
     }
 

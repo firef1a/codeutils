@@ -1,17 +1,11 @@
 {
-
   "key.category.modmod.general": "modmod - General",
   "key.category.modmod.dev": "modmod - Dev",
   "key.category.modmod.staff": "modmod - Staff",
 
-
   "modmod.config.open_config": "Opening config screen...",
   "modmod.config.how": "ok how did you run this command with another screen open",
-  "modmod.vanishmsgs.enabled": " Mod Vanish Enabled",
-  "modmod.vanishmsgs.disabled": " Mod Vanish Disabled",
   "modmod.vanish_tracker.mod_vanish": "Mod Vanish",
   "modmod.vanish_tracker.admin_vanish": "Admin Vanish",
   "modmod.vanish_tracker.yt_vanish": "YT Vanish"
-
-
 }
