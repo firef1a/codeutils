@@ -8,7 +8,7 @@ import java.util.logging.Filter;
 public enum PunishmentTrack {
     // these are matched w/ regex non-case-sensitively
     SPAMMING("Spamming", new PunishmentEscalation(ServerPunishmentType.MUTE,3, PunishmentDuration.D1, PunishmentDuration.D3), List.of("Spamming", "Spam", "Join spam")),
-    PLOT_AD("Plot Ad Misuse", new PunishmentEscalation(ServerPunishmentType.MUTE,1, PunishmentDuration.D1, PunishmentDuration.D3), List.of("Plot Ad (Misuse|missue|misues)")),
+    PLOT_AD("Plot Ad Misuse", new PunishmentEscalation(ServerPunishmentType.MUTE,1, PunishmentDuration.D1, PunishmentDuration.D3), List.of("Plot Ad (Misuse|missue|misues)", "plot ad")),
     FILTER_BYPASS("Filter Bypass", new PunishmentEscalation(ServerPunishmentType.MUTE,3, PunishmentDuration.D1, PunishmentDuration.D14), List.of("Filter Bypass", "Bilter Bypass", "bypassing filter", "chat filter bypass", "bypass filter")),
     TOXICITY_SUICIDE("Suicide Encouragement", new PunishmentEscalation(ServerPunishmentType.MUTE,0, PunishmentDuration.D7, PunishmentDuration.PERM), List.of("Suicide Encouragement", "Suicide")),
     TOXICITY_HARASSMENT("Harassment", new PunishmentEscalation(ServerPunishmentType.MUTE,0, PunishmentDuration.D7, PunishmentDuration.PERM), List.of("Harassment")),

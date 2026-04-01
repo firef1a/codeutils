@@ -86,6 +86,29 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
         if (!getPlayerHistoryQueue.contains(name)) getPlayerHistoryQueue.add(name);
     }
 
+    private void grabPlayerWhois(String name) {
+        if (playerJoinDateStringMap.containsKey(currentGetPlayerHistory)) return;
+
+        String copyName = name.intern();
+        CommandScheduler.addCommand(
+            new ScheduledCommand("whois " + copyName,
+                    0L,
+                    List.of(
+                            new ChatConsumer(
+                                    Pattern.compile("→ Joined: (.*)\\n"),
+                                    (matcher) -> {
+                                        playerJoinDateStringMap.put(copyName, matcher.group(1));
+                                    },
+                                    () -> {
+                                        Mod.messageError("Failed to grab "  + copyName + "'s whois.");
+                                    },
+                                    3000L,
+                                    true
+                        )
+                )
+        ));
+    }
+
     private void initGetPlayerHistory(String name) {
         historyState = HistoryState.HEAD;
         capturePunishmentStartTimestamp = System.currentTimeMillis();
@@ -211,25 +234,8 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
         totalPunishments = 0;
         capturedPunishments = 0;
 
-        if (!playerJoinDateStringMap.containsKey(currentGetPlayerHistory)) {
-            CommandScheduler.addCommand(
-                    new ScheduledCommand("whois " + name,
-                            0L,
-                            List.of(
-                                    new ChatConsumer(
-                                            Pattern.compile("→ Joined: (.*)\\n"),
-                                            (matcher) -> {
-                                                playerJoinDateStringMap.put(currentGetPlayerHistory, matcher.group(1));
-                                            },
-                                            () -> {
-
-                                            },
-                                            3000L,
-                                            true
-                                    )
-                            )
-                    ));
-        }
+        Mod.message(playerJoinDateStringMap.containsKey(currentGetPlayerHistory) + "");
+        grabPlayerWhois(currentGetPlayerHistory);
 
         currentGetPlayerHistory = null;
     }
@@ -253,10 +259,15 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
                 for (PunishmentTrack track : PunishmentTrack.values()) {
                     for (String pattern : track.getPatterns()) {
                         if (Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(reason).find()) {
-                            punishmentTrack = track;
+                            if (punishmentTrack == null) punishmentTrack = track;
+                            else {
+                                if (punishmentTrack.getPunishmentEscalation().severity().ordinal() < track.getPunishmentEscalation().severity().ordinal()) {
+                                    punishmentTrack = track;
+                                }
+                            }
+                            break;
                         }
                     }
-                    if (punishmentTrack != null) break;
                 }
             }
 
