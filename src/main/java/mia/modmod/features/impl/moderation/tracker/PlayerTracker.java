@@ -234,7 +234,6 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
         totalPunishments = 0;
         capturedPunishments = 0;
 
-        Mod.message(playerJoinDateStringMap.containsKey(currentGetPlayerHistory) + "");
         grabPlayerWhois(currentGetPlayerHistory);
 
         currentGetPlayerHistory = null;
@@ -304,6 +303,7 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
                 } else {
                     historyState = HistoryState.DATE;
                 }
+
                 ci.cancel();
             }
         }
@@ -315,11 +315,11 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
                 if (matcher.find()) {
                     if (latestPunishment != null) latestPunishment.setExpirationString(matcher.group(1));
                 }
-                if (!Pattern.matches("^\\[MOD]]", content)) ci.cancel();
+                if (!Pattern.matches("^\\[MOD]", content)) ci.cancel();
             }
             return message.pass();
         }
-        else if (!Pattern.matches("^\\[MOD]]", content))  ci.cancel();
+        else if (!Pattern.matches("^\\[MOD]", content))  ci.cancel();
 
         matcher = Pattern.compile("^Expires in (.+)\\.").matcher(content);
         if (matcher.find()) {

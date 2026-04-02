@@ -18,7 +18,7 @@ public final class AutoTip extends Feature implements ChatEventListener {
     private final DoubleDataField autoTipDelay;
     public AutoTip(Categories category) {
         super(category, "Auto Tip", "autotip", "Automatically tips boosters");
-        autoTipDelay = new DoubleDataField("Auto Tip Delay (seconds)", "", ParameterIdentifier.of(this, "delay"), 0.0, true);
+        autoTipDelay = new DoubleDataField("Auto Tip Delay (seconds)", "", ParameterIdentifier.of(this, "delay"), 4.0, true);
     }
 
     @Override
