@@ -12,6 +12,7 @@ import mia.modmod.features.listeners.ModifiableEventResult;
 import mia.modmod.features.listeners.impl.AlwaysEnabled;
 import mia.modmod.features.listeners.impl.ChatEventListener;
 import mia.modmod.features.listeners.impl.PacketListener;
+import mia.modmod.features.listeners.impl.TickEvent;
 import mia.modmod.features.parameters.ParameterIdentifier;
 import mia.modmod.features.parameters.impl.BooleanDataField;
 import mia.modmod.features.parameters.impl.InternalBooleanDataField;
@@ -20,10 +21,11 @@ import net.minecraft.network.protocol.Packet;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class VanishTracker extends Feature implements ChatEventListener, PacketListener, AlwaysEnabled {
+public final class VanishTracker extends Feature implements ChatEventListener, PacketListener, AlwaysEnabled, TickEvent {
     private final BooleanDataField modVanishEnabledField;
     private final BooleanDataField adminVanishEnabledField;
     private final BooleanDataField ytVanishEnabledField;
@@ -150,4 +152,29 @@ public final class VanishTracker extends Feature implements ChatEventListener, P
     }
 
 
+    @Override
+    public void tickR(int tick) {
+        Component mv = Component.literal("[MOD]").withColor(0x30CC20).append(
+                Component.literal(" Mod Vanished").withColor(0x92FF87)
+        );
+        Component av = Component.literal("[ADMIN]").withColor(ColorBank.DF_ADMIN).append(
+                Component.literal(" Admin Vanished").withColor(0xFF9B9B)
+        );
+        if ((modVanishEnabledField.getValue() && adminVanishEnabledField.getValue())) {
+            Mod.hotbarMessage(Component.empty().append(mv).append(Component.literal(" + ").withColor(ColorBank.MC_GRAY)).append(av));
+        } else {
+            if (modVanishEnabledField.getValue()) {
+                Mod.hotbarMessage(mv);
+            }
+            if (adminVanishEnabledField.getValue()) {
+                Mod.hotbarMessage(av);
+            }
+        }
+
+    }
+
+    @Override
+    public void tickF(int tick) {
+
+    }
 }

@@ -245,6 +245,8 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
         String content = message.base().getString();
         Matcher matcher;
 
+        if (!Pattern.matches("^\\[MOD]", content)) return message.pass();
+
         matcher = PUNISH_BODY_PATTERN.matcher(content);
         if (matcher.find()) {
             String offender = matcher.group(1);

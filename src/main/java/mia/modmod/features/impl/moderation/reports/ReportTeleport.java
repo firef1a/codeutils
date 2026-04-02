@@ -118,7 +118,6 @@ public final class ReportTeleport extends Feature implements ChatEventListener, 
 
     public static void sendModChatReportHash(int hashcode) {
         if (FeatureManager.getFeature(ReportTeleport.class).msgOnReportTeleport.getValue()) {
-            Mod.messageError("mb " + HASH_PREFIX + hashcode);
             CommandScheduler.addCommand(new ScheduledCommand("mb " + HASH_PREFIX + hashcode));
         }
     }

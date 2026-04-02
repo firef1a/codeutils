@@ -120,7 +120,7 @@ public class Mod implements ClientModInitializer {
 		}
 	}
 
-	private static void message(Component message, int mia, int main) {
+	private static void message(Component message, int id_color) {
 		if (Mod.MC.player == null) return;
 		if (message.equals(Component.empty())) {
 			rawMessage(message);
@@ -128,9 +128,18 @@ public class Mod implements ClientModInitializer {
 		}
 		Mod.MC.execute(() -> {
 			Mod.MC.player.displayClientMessage(Component.empty()
-				.append(Component.literal(MOD_ID + " ").withColor(mia))
+				.append(Component.literal(MOD_ID + " ").withColor(id_color))
 				.append(Component.literal("᛬ ").withColor(0x9c9c9c))
 				.append(message.copy()), false);
+		});
+
+	}
+
+	public static void hotbarMessage(Component message) {
+		if (Mod.MC.player == null) return;
+
+		Mod.MC.execute(() -> {
+			Mod.MC.player.displayClientMessage(message, true);
 		});
 
 	}
@@ -144,16 +153,16 @@ public class Mod implements ClientModInitializer {
 	}
 
 	public static void message(Component message) {
-		message(message, ColorBank.MIA_PURPLE, ColorBank.WHITE);
+		message(message, ColorBank.MIA_PURPLE);
 	}
 
 	public static void message(String message) {
-		message(Component.literal(message), ColorBank.MIA_PURPLE, ColorBank.WHITE);
+		message(Component.literal(message), ColorBank.MIA_PURPLE);
 	}
 
 
 	public static void messageError(Component message) {
-		message(message.copy().withColor(ColorBank.MC_RED), 0xff695c, 0xff6052);
+		message(message.copy().withColor(ColorBank.MC_RED), 0xff695c);
 	}
 	public static void messageError(String message) {
 		messageError(Component.literal(message).withColor(ColorBank.MC_RED));
