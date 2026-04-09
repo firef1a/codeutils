@@ -172,8 +172,9 @@ public final class PlayerTracker extends Feature implements RegisterCommandListe
 
             for (PunishmentData punishmentData : activePunishments) {
                 text.add(
-                        Component.literal(punishmentData.reason()).withColor(ColorBank.MC_RED)
-                                .append(Component.literal(" [Expires: " + ((punishmentData.getExpirationString().isPresent() ? punishmentData.getExpirationString().get() : "N/A")) + "]").withColor(0xc2301d))
+                        punishmentData.punishmentType().getPrefixText().copy().append(
+                        Component.literal(" " +  punishmentData.reason()).withColor(ColorBank.MC_RED)
+                                .append(Component.literal(" [Expires: " + ((punishmentData.getExpirationString().isPresent() ? punishmentData.getExpirationString().get() : "N/A")) + "]").withColor(0xc2301d)))
                 );
             }
         }

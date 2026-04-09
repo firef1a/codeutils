@@ -27,6 +27,7 @@ public abstract class MClientConnection {
     @ModifyVariable(method = "genericsFtw", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private static Packet<?> handlePacket(Packet<?> packet) {
         if (packet instanceof ClientboundSystemChatPacket(Component content, boolean overlay)) {
+            if (overlay) return packet;
             canceled = false;
 
             CallbackInfo ci = new CallbackInfo("", true);
