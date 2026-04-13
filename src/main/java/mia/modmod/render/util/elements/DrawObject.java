@@ -8,6 +8,8 @@ import net.minecraft.client.input.MouseButtonEvent;
 
 import java.util.ArrayList;
 
+// todo: replace class initializer with builder based widget system, also move rendering code into its own library for use in my other mods
+
 public abstract class DrawObject {
     protected Point position, size;
 
@@ -17,14 +19,22 @@ public abstract class DrawObject {
     protected DrawBinding parentBinding;
     protected DrawBinding selfBinding;
 
+    protected boolean renderSelfWithScissors;
+    protected boolean renderChildrenWithScissors;
+
     public DrawBinding getParentBinding() { return parentBinding == null ? new DrawBinding(AxisBinding.NONE, AxisBinding.NONE) : parentBinding; }
     public DrawBinding getSelfBinding() { return selfBinding == null ? new DrawBinding(AxisBinding.NONE, AxisBinding.NONE) : selfBinding; }
     public void setParentBinding(DrawBinding binding) { this.parentBinding = binding; }
     public void setSelfBinding(DrawBinding binding) { this.selfBinding = binding; }
 
-    public void setParent(DrawObject parent) { this.parent = parent; };
-    public void addDrawable(DrawObject child) { drawables.add(child); child.setParent(this); };
-    public void clearDrawables() { drawables.clear(); };
+    public void setParent(DrawObject parent) { this.parent = parent; }
+    public void addDrawable(DrawObject child) { drawables.add(child); child.setParent(this); }
+    public void clearDrawables() { drawables.clear(); }
+
+    public void setRenderWithScissors(boolean renderSelfWithScissors, boolean renderChildrenWithScissors) {
+        this.renderSelfWithScissors = renderSelfWithScissors;
+        this.renderChildrenWithScissors = renderChildrenWithScissors;
+    }
 
     public Point getRawPosition() { return position; }
 
@@ -48,13 +58,10 @@ public abstract class DrawObject {
     public int getHeight() { return getSize().y(); }
     public int getWidth() { return getSize().x(); }
 
+
     public boolean mouseClick(MouseButtonEvent click, boolean doubled) {
-        //Mod.message(this.toString() + " " + Mod.tick);
-        for (DrawObject object : drawables) {
-            //object.mouseClick(click, doubled);
-        }
         return false;
-    };
+    }
 
     public boolean containsPoint(double mouseX, double mouseY) {
         int x = (int) mouseX;
@@ -65,7 +72,12 @@ public abstract class DrawObject {
     protected abstract void draw(GuiGraphics context, int mouseX, int mouseY);
 
     public void render(GuiGraphics context, int mouseX, int mouseY) {
+        if (renderSelfWithScissors) context.enableScissor(this.x1(), this.y1(), this.x2(), this.y2());
         draw(context, mouseX, mouseY);
+        if (renderSelfWithScissors)context.disableScissor();
+
+        if (renderChildrenWithScissors) context.enableScissor(this.x1(), this.y1(), this.x2(), this.y2());
         this.drawables.forEach(object -> object.render( context, mouseX, mouseY));
-    };
+        if (renderChildrenWithScissors) context.disableScissor();
+    }
 }

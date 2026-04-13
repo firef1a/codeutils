@@ -79,14 +79,9 @@ public class ModQAScreen extends Screen {
                         new ARGB(playerName.equals(selectedPlayer) ? enabledColor : buttonColor, 1f * animation.getProgress()),
                         new ARGB(enabledColor, 1f * animation.getProgress()),
                         sidebarContainer
-                ) {
-                    @Override
-                    public void render(GuiGraphics context, int mouseX, int mouseY) {
-                        context.enableScissor(this.x1(), this.y1(), this.x2(), this.y2());
-                        super.render(context,mouseX,mouseY);
-                        context.disableScissor();
-                    }
-                };
+                );
+                playerContainer.setRenderWithScissors(true, true);
+
                 playerContainer.setCallback(() -> {
                     setSelectedPlayer(playerName);
                 });
@@ -274,14 +269,8 @@ public class ModQAScreen extends Screen {
                             new ARGB(mainColor, 0.55f * animation.getProgress()),
                             new ARGB(enabledColor, 0.55f * animation.getProgress()),
                             optionButtonList.parent()
-                    ) {
-                        @Override
-                        public void render(GuiGraphics context, int mouseX, int mouseY) {
-                            context.enableScissor(this.x1(), this.y1(), this.x2(), this.y2());
-                            super.render(context, mouseX, mouseY);
-                            context.disableScissor();
-                        }
-                    };
+                    );
+                    optionButton.setRenderWithScissors(true, true);
 
                     buttons.add(optionButton);
                     optionButton.setParentBinding(new DrawBinding(AxisBinding.NONE, AxisBinding.FULL));
@@ -487,6 +476,6 @@ public class ModQAScreen extends Screen {
         if (animation.getAnimationStage().equals(AnimationStage.OPEN)) {
             animation.setAnimationStage(AnimationStage.CLOSING);
         }
-        if (parent == null) Mod.MC.setScreen((Screen) null);
+        if (parent == null) Mod.MC.setScreen(null);
     }
 }
