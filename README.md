@@ -6,7 +6,8 @@
 <img style="height: auto;" alt="modscreenshowcase" src="https://github.com/user-attachments/assets/8b030f65-bcee-4d01-a322-43ad3ec65180" />
 
 ### Latest Release
-> [Latest Release](https://github.com/miawara/modmod/releases)
+> [Latest Release](https://github.com/miawara/modmod/releases)<br>
+> Modrinth page: https://modrinth.com/mod/modmod
 
 
 ## Commands

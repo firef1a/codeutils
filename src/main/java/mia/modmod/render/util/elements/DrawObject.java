@@ -24,6 +24,7 @@ public abstract class DrawObject {
 
     public DrawBinding getParentBinding() { return parentBinding == null ? new DrawBinding(AxisBinding.NONE, AxisBinding.NONE) : parentBinding; }
     public DrawBinding getSelfBinding() { return selfBinding == null ? new DrawBinding(AxisBinding.NONE, AxisBinding.NONE) : selfBinding; }
+
     public void setParentBinding(DrawBinding binding) { this.parentBinding = binding; }
     public void setSelfBinding(DrawBinding binding) { this.selfBinding = binding; }
 
@@ -64,8 +65,6 @@ public abstract class DrawObject {
     }
 
     public boolean containsPoint(double mouseX, double mouseY) {
-        int x = (int) mouseX;
-        int y = (int) mouseY;
         return mouseX > x1() && mouseX < x2() && mouseY > y1() && mouseY < y2();
     }
 
