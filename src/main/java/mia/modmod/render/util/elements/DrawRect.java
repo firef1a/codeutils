@@ -3,17 +3,20 @@ package mia.modmod.render.util.elements;
 import mia.modmod.render.util.ARGB;
 import mia.modmod.render.util.DrawContextHelper;
 import mia.modmod.render.util.Point;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.MultiLineEditBox;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 
 public class DrawRect extends DrawObject {
     protected final ARGB color;
 
-    public DrawRect(Point position, Point size, ARGB color) {
-        this(position, size, color, null);
-    }
-
+    public DrawRect(Point position, Point size, ARGB color) { this(position, size, color, null); }
     public DrawRect(Point position, Point size, ARGB color, DrawObject parent) {
         this.position = position;
         this.size = size;

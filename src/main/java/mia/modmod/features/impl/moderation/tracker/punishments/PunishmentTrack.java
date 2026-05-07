@@ -4,7 +4,6 @@ import mia.modmod.core.FileManager;
 
 import java.sql.ResultSet;
 import java.util.List;
-import java.util.logging.Filter;
 
 public enum PunishmentTrack {
     // these are matched w/ regex non-case-sensitively
@@ -31,7 +30,7 @@ public enum PunishmentTrack {
 
     SERVER_CRASHING("Intentional Server Crashing", new PunishmentEscalation(ServerPunishmentType.BAN,0, PunishmentDuration.PERM, PunishmentDuration.PERM), List.of("Crashing (Server|Node)", "Server (Crash|Crashing|Crashes|Node)", "Intentionally Crashing (Server|Node)", "Intentional (Server|Node) Crashing", "Exploit Abuse")),
 
-    INAPPROPRIATE_SKIN_USERNAME("Inappropriate Skin / Username (Appeal when changed)", new PunishmentEscalation(ServerPunishmentType.BAN,0, PunishmentDuration.PERM, PunishmentDuration.PERM), List.of("(Inappropriate|explicit) Skin", "(Inappropriate|explicit) (|User)Name")),
+    INAPPROPRIATE_SKIN_USERNAME("Inappropriate Skin / Username (Appeal when changed)", new PunishmentEscalation(ServerPunishmentType.BAN,0, PunishmentDuration.PERM, PunishmentDuration.PERM), List.of("(Inappropriate|explicit|disallowed|banned) Skin", "(Inappropriate|explicit|disallowed|banned) (|User)Name")),
     BAN_EVASION("Ban Evasion", new PunishmentEscalation(ServerPunishmentType.BAN,0, PunishmentDuration.PERM, PunishmentDuration.PERM), List.of("Ban Evasion")),
 
     // Requires custom duration input
@@ -43,7 +42,6 @@ public enum PunishmentTrack {
             SPAMMING,
             PLOT_AD,
             FILTER_BYPASS,
-            INAPPROPRIATE_CHAT,
             TOXICITY_GENERAL_RUDENESS
     );
 

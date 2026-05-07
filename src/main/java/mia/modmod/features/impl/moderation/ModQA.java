@@ -2,8 +2,6 @@ package mia.modmod.features.impl.moderation;
 
 import mia.modmod.Mod;
 import mia.modmod.core.KeyBindCategories;
-import mia.modmod.core.KeyBindManager;
-import mia.modmod.core.MiaKeyBind;
 import mia.modmod.features.Categories;
 import mia.modmod.features.Feature;
 import mia.modmod.features.impl.internal.server.ServerManager;
@@ -14,18 +12,20 @@ import mia.modmod.features.parameters.ParameterIdentifier;
 import mia.modmod.features.parameters.impl.BooleanDataField;
 import mia.modmod.render.screens.AnimationStage;
 import mia.modmod.render.screens.modqa.ModQAScreen;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.GuiGraphics;
 import org.lwjgl.glfw.GLFW;
 
 public final class ModQA extends Feature implements RegisterKeyBindEvent, TickEvent, RenderHUD {
-    public MiaKeyBind openQA;
+    public KeyMapping openQA;
     private ModQAScreen modQAScreen;
     public final BooleanDataField safetyMode;
 
     public ModQA(Categories category) {
         super(category, "Mod Quick Access Screen", "modqa", "Screen for selecting common ban / mute reasons");
-        openQA = new MiaKeyBind("Open Mod Screen", GLFW.GLFW_KEY_X, KeyBindCategories.STAFF);
+        openQA = new KeyMapping("Open Mod Screen", GLFW.GLFW_KEY_X, KeyBindCategories.STAFF.getCategory());
         safetyMode = new BooleanDataField("Safety Mode", "prevents u from banning yourself (i already made it pretty hard this is for testing purposes only)", ParameterIdentifier.of(this, "safe_mode"), true, true);
     }
 
@@ -38,7 +38,7 @@ public final class ModQA extends Feature implements RegisterKeyBindEvent, TickEv
 
     @Override
     public void registerKeyBind() {
-        KeyBindManager.registerKeyBind(openQA);
+        KeyBindingHelper.registerKeyBinding(openQA);
     }
 
     @Override

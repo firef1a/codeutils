@@ -35,8 +35,8 @@ public abstract class MClientConnection {
 
 
             if (FeatureManager.getFeature(VerboseLogger.class).verboseChatLogger.getValue()) {
-                Mod.warn(content.getString());
-                Mod.warn(content.toString());
+               // Mod.warn(content.getString());
+                //Mod.warn(content.toString());
             }
 
             for (ChatEventListener feature :  FeatureManager.getFeaturesByIdentifier(ChatEventListener.class)) {

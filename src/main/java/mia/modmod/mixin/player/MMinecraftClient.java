@@ -1,7 +1,6 @@
 package mia.modmod.mixin.player;
 
 import mia.modmod.Mod;
-import mia.modmod.core.MiaKeyBind;
 import mia.modmod.features.FeatureManager;
 import mia.modmod.features.impl.development.SignPeek;
 import mia.modmod.features.listeners.impl.PlayerUseEventListener;

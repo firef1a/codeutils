@@ -2,9 +2,6 @@ package mia.modmod.features.impl.development;
 
 import mia.modmod.ColorBank;
 import mia.modmod.Mod;
-import mia.modmod.core.KeyBindCategories;
-import mia.modmod.core.KeyBindManager;
-import mia.modmod.core.MiaKeyBind;
 import mia.modmod.core.items.MDFItem;
 import mia.modmod.features.Categories;
 import mia.modmod.features.Feature;
@@ -20,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.*;

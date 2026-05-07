@@ -3,8 +3,6 @@ package mia.modmod.features.impl.moderation.reports;
 import mia.modmod.ColorBank;
 import mia.modmod.Mod;
 import mia.modmod.core.KeyBindCategories;
-import mia.modmod.core.KeyBindManager;
-import mia.modmod.core.MiaKeyBind;
 import mia.modmod.features.Categories;
 import mia.modmod.features.Feature;
 import mia.modmod.features.impl.internal.server.ServerManager;
@@ -16,7 +14,9 @@ import mia.modmod.features.listeners.impl.RenderHUD;
 import mia.modmod.features.listeners.impl.TickEvent;
 import mia.modmod.render.screens.AnimationStage;
 import mia.modmod.render.screens.reportscreen.ReportScreen;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
@@ -27,13 +27,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class ReportTracker extends Feature implements RegisterKeyBindEvent, TickEvent, RenderHUD, ChatEventListener {
-    public MiaKeyBind openQA;
+    public KeyMapping openQA;
     private ReportScreen reportScreen;
     public ArrayList<DatedReport> reports;
 
     public ReportTracker(Categories category) {
         super(category, "Report Tracker", "report_tracker", "Shows recent reports");
-        openQA = new MiaKeyBind("Open Report Screen", GLFW.GLFW_KEY_O, KeyBindCategories.STAFF);
+        openQA = new KeyMapping("Open Report Screen", GLFW.GLFW_KEY_O, KeyBindCategories.STAFF.getCategory());
         reports = new ArrayList<>();
   }
 
@@ -86,7 +86,7 @@ public final class ReportTracker extends Feature implements RegisterKeyBindEvent
 
     @Override
     public void registerKeyBind() {
-        KeyBindManager.registerKeyBind(openQA);
+        KeyBindingHelper.registerKeyBinding(openQA);
     }
 
     @Override

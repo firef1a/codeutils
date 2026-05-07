@@ -8,6 +8,7 @@ import mia.modmod.features.Feature;
 import mia.modmod.features.impl.internal.server.ServerManager;
 import mia.modmod.features.listeners.impl.*;
 import mia.modmod.features.parameters.ParameterIdentifier;
+import mia.modmod.features.parameters.impl.BooleanDataField;
 import mia.modmod.features.parameters.impl.ColorDataField;
 import mia.modmod.render.util.*;
 import mia.modmod.render.util.Point;
@@ -34,10 +35,12 @@ import java.util.*;
 import java.util.List;
 public final class PlayerOutliner extends Feature implements RenderHUD, ServerConnectionEventListener, WorldRenderEventListener, PacketListener {
     private final ColorDataField outlinerColor;
+    private final BooleanDataField shadeOutline;
 
     public PlayerOutliner(Categories category) {
         super(category, "Player Outliner", "outliner", "outlines tracked players");
         outlinerColor = new ColorDataField("Outline Color", "", new ParameterIdentifier(this, "outline_color"), new Color(0xed7aff), true);
+        shadeOutline = new BooleanDataField("Shade Outline", "", new ParameterIdentifier(this, "shade"), false, true);
     }
 
     @Override
@@ -186,7 +189,7 @@ public final class PlayerOutliner extends Feature implements RenderHUD, ServerCo
 
         DrawContextHelper.drawRectBorder(context, x, y, width, height, new ARGB(color, 1.0f));
         DrawRect shaded = new DrawRect(new Point(x, y), new Point(width, height),  new ARGB(color, 0.4f));
-        shaded.render(context, 0, 0);
+        if (shadeOutline.getValue()) shaded.render(context, 0, 0);
 
         labelRect.render(context, 0, 0);
     }
