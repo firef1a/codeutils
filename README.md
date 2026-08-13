@@ -1,5 +1,5 @@
 ## modmod
-DiamondFire mod with various QOL features for support staff and moderators, so you can burn out and quit DF faster.
+Fabric mod for the DiamondFire server for moderation and support.
 
 > **General Features**
 - Custom node select screen (keybind `K`)
